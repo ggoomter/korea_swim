@@ -42,7 +42,7 @@ if os.path.exists(frontend_path):
         app.mount("/data", StaticFiles(directory=data_path), name="data")
 
 # 라우터 등록 - 정적 파일 이후에 등록
-app.include_router(pools.router)
+app.include_router(pools.router, prefix="/api")
 
 @app.on_event("startup")
 def startup_event():
