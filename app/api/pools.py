@@ -8,7 +8,7 @@ from database.connection import get_db
 router = APIRouter(prefix="/pools", tags=["pools"])
 
 @router.get("/", response_model=List[SwimmingPoolResponse])
-def get_pools(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_pools(skip: int = 0, limit: int = 1000, db: Session = Depends(get_db)):
     """모든 수영장 조회"""
     pools = crud.get_swimming_pools(db, skip=skip, limit=limit)
     return pools
