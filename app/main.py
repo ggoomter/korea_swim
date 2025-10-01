@@ -21,10 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 라우터 등록
-app.include_router(pools.router)
-
-# 정적 파일 서빙 (프론트엔드)
+# 정적 파일 서빙 (프론트엔드) - 라우터보다 먼저 마운트
 frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 
 # CSS, JS 등 정적 파일들을 각각 마운트
@@ -43,6 +40,9 @@ if os.path.exists(frontend_path):
     data_path = os.path.join(frontend_path, "data")
     if os.path.exists(data_path):
         app.mount("/data", StaticFiles(directory=data_path), name="data")
+
+# 라우터 등록 - 정적 파일 이후에 등록
+app.include_router(pools.router)
 
 @app.on_event("startup")
 def startup_event():
