@@ -26,8 +26,23 @@ app.include_router(pools.router)
 
 # 정적 파일 서빙 (프론트엔드)
 frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
+
+# CSS, JS 등 정적 파일들을 각각 마운트
 if os.path.exists(frontend_path):
-    app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+    # CSS 파일
+    css_path = os.path.join(frontend_path, "css")
+    if os.path.exists(css_path):
+        app.mount("/css", StaticFiles(directory=css_path), name="css")
+
+    # JS 파일
+    js_path = os.path.join(frontend_path, "js")
+    if os.path.exists(js_path):
+        app.mount("/js", StaticFiles(directory=js_path), name="js")
+
+    # data 파일
+    data_path = os.path.join(frontend_path, "data")
+    if os.path.exists(data_path):
+        app.mount("/data", StaticFiles(directory=data_path), name="data")
 
 @app.on_event("startup")
 def startup_event():
