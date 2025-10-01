@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(uvicorn:*)",
+      "Bash(timeout:*)",
+      "Bash(python test:*)",
+      "Bash(python:*)",
+      "Bash(start frontend/index_simple.html)",
+      "Bash(start frontend/index_improved.html)",
+      "Bash(start frontend/index_premium.html)",
+      "Bash(if exist swimming_pools.db del /f swimming_pools.db)",
+      "Bash(start frontend/index_refactored.html)",
+      "Bash(dir:*)",
+      "Bash(start http://localhost:8080/index_refactored.html)",
+      "Bash(curl:*)",
+      "WebSearch",
+      "WebFetch(domain:data.seoul.go.kr)",
+      "Read(//g/**)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

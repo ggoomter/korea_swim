@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국 수영장 찾기 🏊</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 100px);
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            width: 400px;
+            background: white;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .search-box {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-box h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .results {
+            padding: 20px;
+        }
+
+        .pool-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pool-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            border-color: #667eea;
+        }
+
+        .pool-card h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .pool-info {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .pool-price {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .info-text {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .distance-badge {
+            display: inline-block;
+            background: #ffeaa7;
+            color: #2d3436;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .facilities {
+            margin-top: 8px;
+        }
+
+        .facility-tag {
+            display: inline-block;
+            background: #e8f4f8;
+            color: #0984e3;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-right: 4px;
+            margin-top: 4px;
+        }
+
+        .instruction {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏊 한국 수영장 찾기</h1>
+        <p>지도를 클릭하거나 현재 위치에서 근처 수영장을 찾아보세요</p>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="search-box">
+                <div class="instruction">
+                    💡 <strong>사용법:</strong><br>
+                    1. 주소 검색 (예: 종로 경찰서)<br>
+                    2. 현재 위치 버튼 클릭<br>
+                    3. 또는 지도에서 원하는 위치 클릭
+                </div>
+
+                <h3>📍 주소 검색</h3>
+                <div class="input-group">
+                    <input type="text" id="searchAddress" placeholder="예: 종로 경찰서, 강남역" onkeypress="if(event.keyCode==13) searchAddress()">
+                </div>
+                <button class="btn" onclick="searchAddress()" style="margin-bottom: 20px;">🔍 주소로 검색</button>
+
+                <h3>🔍 검색 옵션</h3>
+
+                <div class="input-group">
+                    <label>검색 반경</label>
+                    <select id="radius">
+                        <option value="3">3km</option>
+                        <option value="5" selected>5km</option>
+                        <option value="10">10km</option>
+                        <option value="15">15km</option>
+                        <option value="20">20km</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>최대 가격 (1회 이용)</label>
+                    <select id="maxPrice">
+                        <option value="">제한 없음</option>
+                        <option value="5000">5,000원 이하</option>
+                        <option value="7000">7,000원 이하</option>
+                        <option value="10000">10,000원 이하</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="getCurrentLocation()">📍 현재 위치에서 찾기</button>
+                <button class="btn btn-secondary" onclick="searchSeoul()">🏙️ 서울 중심에서 찾기</button>
+            </div>
+
+            <div class="results" id="results">
+                <div class="info-text">
+                    👆 위의 버튼을 클릭하거나<br>
+                    지도를 클릭해주세요
+                </div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        const NOMINATIM_API = 'https://nominatim.openstreetmap.org/search';
+        let map;
+        let currentMarker;
+        let poolMarkers = [];
+
+        // Leaflet 지도 초기화 (무료 오픈스트리트맵 사용)
+        function initMap() {
+            map = L.map('map').setView([37.5665, 126.9780], 12); // 서울 시청
+
+            // 오픈스트리트맵 타일
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // 지도 클릭 이벤트
+            map.on('click', function(e) {
+                searchPools(e.latlng.lat, e.latlng.lng);
+            });
+
+            console.log('✅ 지도 초기화 완료');
+        }
+
+        // 현재 위치 가져오기
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                document.getElementById('results').innerHTML = '<div class="loading">📍 위치를 찾는 중...</div>';
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        searchPools(lat, lng);
+                        map.setView([lat, lng], 13);
+                    },
+                    (error) => {
+                        alert('위치 정보를 가져올 수 없습니다.\n지도를 클릭하거나 "서울 중심에서 찾기"를 이용해주세요.');
+                        document.getElementById('results').innerHTML = '<div class="info-text">지도를 클릭해주세요</div>';
+                    }
+                );
+            } else {
+                alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
+            }
+        }
+
+        // 서울 중심 검색
+        function searchSeoul() {
+            const lat = 37.5665;
+            const lng = 126.9780;
+            searchPools(lat, lng);
+            map.setView([lat, lng], 12);
+        }
+
+        // 주소 검색
+        async function searchAddress() {
+            const address = document.getElementById('searchAddress').value.trim();
+
+            if (!address) {
+                alert('주소를 입력해주세요.');
+                return;
+            }
+
+            document.getElementById('results').innerHTML = '<div class="loading">🔍 주소 검색 중...</div>';
+
+            try {
+                // Nominatim API로 주소 검색 (무료)
+                const response = await fetch(`${NOMINATIM_API}?format=json&q=${encodeURIComponent(address + ' 대한민국')}&limit=5`);
+                const results = await response.json();
+
+                if (results.length === 0) {
+                    alert('주소를 찾을 수 없습니다. 다른 검색어를 시도해보세요.');
+                    document.getElementById('results').innerHTML = '<div class="info-text">주소를 찾을 수 없습니다</div>';
+                    return;
+                }
+
+                // 첫 번째 결과 사용
+                const location = results[0];
+                const lat = parseFloat(location.lat);
+                const lng = parseFloat(location.lon);
+
+                // 해당 위치로 이동 및 검색
+                map.setView([lat, lng], 14);
+                searchPools(lat, lng);
+
+            } catch (error) {
+                console.error('주소 검색 오류:', error);
+                alert('주소 검색에 실패했습니다.');
+                document.getElementById('results').innerHTML = '<div class="info-text">주소 검색 실패</div>';
+            }
+        }
+
+        // 수영장 검색
+        async function searchPools(lat, lng) {
+            const radius = parseFloat(document.getElementById('radius').value);
+            const maxPrice = document.getElementById('maxPrice').value;
+
+            // 검색 위치 마커 표시
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+
+            currentMarker = L.marker([lat, lng], {
+                icon: L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                })
+            }).addTo(map);
+
+            currentMarker.bindPopup('🔍 검색 위치').openPopup();
+            map.setView([lat, lng], 13);
+
+            // API 호출
+            document.getElementById('results').innerHTML = '<div class="loading">🔍 검색 중...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/pools/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        lat: lat,
+                        lng: lng,
+                        radius_km: radius,
+                        max_price: maxPrice ? parseInt(maxPrice) : null,
+                        has_free_swim: true
+                    })
+                });
+
+                const pools = await response.json();
+                displayResults(pools, lat, lng);
+                displayMarkersOnMap(pools);
+
+            } catch (error) {
+                console.error('검색 오류:', error);
+                document.getElementById('results').innerHTML = `
+                    <div class="info-text" style="color: red;">
+                        ❌ 서버 연결 실패<br>
+                        <small>API 서버가 실행 중인지 확인하세요<br>
+                        (uvicorn app.main:app --reload)</small>
+                    </div>
+                `;
+            }
+        }
+
+        // 검색 결과 표시
+        function displayResults(pools, centerLat, centerLng) {
+            const resultsDiv = document.getElementById('results');
+
+            if (pools.length === 0) {
+                resultsDiv.innerHTML = '<div class="info-text">😢 근처에 수영장이 없습니다<br><small>검색 반경을 늘려보세요</small></div>';
+                return;
+            }
+
+            let html = `<h3 style="margin-bottom: 15px; color: #333;">📋 ${pools.length}개 수영장 발견</h3>`;
+
+            pools.forEach((pool, index) => {
+                const distance = calculateDistance(centerLat, centerLng, pool.lat, pool.lng);
+
+                html += `
+                    <div class="pool-card" onclick="focusPool(${pool.lat}, ${pool.lng}, '${pool.name.replace(/'/g, "\\'")}')">
+                        <h4>${index + 1}. ${pool.name}</h4>
+                        <div class="pool-info">📍 ${pool.address}</div>
+                        ${pool.phone ? `<div class="pool-info">📞 ${pool.phone}</div>` : ''}
+                        ${pool.daily_price ? `<div class="pool-info">💰 1회: ${pool.daily_price.toLocaleString()}원</div>` : ''}
+                        ${pool.free_swim_price ? `<div class="pool-info">🏊 자율수영: ${pool.free_swim_price.toLocaleString()}원</div>` : ''}
+                        ${pool.facilities && pool.facilities.length > 0 ? `
+                            <div class="facilities">
+                                ${pool.facilities.map(f => `<span class="facility-tag">${f}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        <span class="distance-badge">${distance.toFixed(1)}km</span>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // 지도에 마커 표시
+        function displayMarkersOnMap(pools) {
+            // 기존 마커 제거
+            poolMarkers.forEach(marker => map.removeLayer(marker));
+            poolMarkers = [];
+
+            // 새 마커 추가
+            pools.forEach((pool, index) => {
+                // 숫자 마커 생성
+                const numberIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `
+                        <div style="
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            width: 35px;
+                            height: 35px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: bold;
+                            font-size: 14px;
+                            border: 3px solid white;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                            cursor: pointer;
+                        ">${index + 1}</div>
+                    `,
+                    iconSize: [35, 35],
+                    iconAnchor: [17, 17],
+                });
+
+                const marker = L.marker([pool.lat, pool.lng], {
+                    icon: numberIcon
+                }).addTo(map);
+
+                // 상세 팝업
+                let popupContent = `
+                    <div style="min-width: 250px; max-width: 300px;">
+                        <strong style="color: #667eea; font-size: 16px;">${index + 1}. ${pool.name}</strong><br>
+                        <div style="margin-top: 8px; font-size: 13px; line-height: 1.6; color: #555;">
+                            📍 ${pool.address}<br>
+                            ${pool.phone ? `📞 ${pool.phone}<br>` : ''}
+                            ${pool.daily_price ? `💰 1회 이용: <strong>${pool.daily_price.toLocaleString()}원</strong><br>` : ''}
+                            ${pool.free_swim_price ? `🏊 자율수영: <strong style="color: #667eea;">${pool.free_swim_price.toLocaleString()}원</strong><br>` : ''}
+                            ${pool.lanes ? `🏊‍♂️ 레인: ${pool.lanes}개<br>` : ''}
+                            ${pool.pool_size ? `📏 크기: ${pool.pool_size}<br>` : ''}
+                            ${pool.water_temp ? `🌡️ 수온: ${pool.water_temp}<br>` : ''}
+                            ${pool.facilities && pool.facilities.length > 0 ? `
+                                <div style="margin-top: 5px;">
+                                    🏢 ${pool.facilities.join(', ')}
+                                </div>
+                            ` : ''}
+                            ${pool.membership_prices ? `
+                                <div style="margin-top: 5px; font-size: 12px; color: #888;">
+                                    회원권: ${pool.membership_prices['1month'] ? pool.membership_prices['1month'].toLocaleString() + '원/월' : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+
+                // 마우스 오버 시 팝업 표시
+                marker.on('mouseover', function() {
+                    this.openPopup();
+                });
+
+                // 클릭 시 팝업 고정
+                marker.on('click', function() {
+                    this.openPopup();
+                });
+
+                poolMarkers.push(marker);
+            });
+
+            // 모든 마커가 보이도록 지도 조정
+            if (pools.length > 0) {
+                const bounds = L.latLngBounds(pools.map(p => [p.lat, p.lng]));
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+
+        // 수영장 위치로 이동
+        function focusPool(lat, lng, name) {
+            map.setView([lat, lng], 16);
+
+            // 해당 마커의 팝업 열기
+            poolMarkers.forEach(marker => {
+                if (marker.getLatLng().lat === lat && marker.getLatLng().lng === lng) {
+                    marker.openPopup();
+                }
+            });
+        }
+
+        // 거리 계산 (Haversine)
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // 페이지 로드 시 지도 초기화
+        window.onload = initMap;
+    </script>
+</body>
+</html>

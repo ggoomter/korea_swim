@@ -1,0 +1,29 @@
+{
+  "api": {
+    "baseUrl": "http://localhost:8000",
+    "endpoints": {
+      "pools": "/api/pools",
+      "search": "/api/pools/search",
+      "nearby": "/api/pools/nearby"
+    }
+  },
+  "map": {
+    "defaultCenter": {
+      "lat": 37.5665,
+      "lng": 126.9780
+    },
+    "defaultZoom": 12,
+    "searchRadius": 5,
+    "tileLayer": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "attribution": "&copy; OpenStreetMap contributors"
+  },
+  "search": {
+    "nominatimUrl": "https://nominatim.openstreetmap.org/search",
+    "debounceDelay": 500
+  },
+  "ui": {
+    "theme": "dark",
+    "maxResultsPerPage": 50,
+    "showSubwayLines": true
+  }
+}

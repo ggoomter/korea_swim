@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwimSeoul - 서울 수영장 검색 🏊</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: #818CF8;
+            --accent: #EC4899;
+            --accent-light: #F9A8D4;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --surface-light: #334155;
+            --text-primary: #F8FAFC;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+            --border: #334155;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* 헤더 */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px var(--shadow);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            display: flex;
+            height: calc(100vh - 96px);
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            width: 420px;
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            position: relative;
+        }
+
+        .search-section {
+            padding: 24px;
+            background: var(--surface-light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 48px 16px 20px;
+            background: var(--background);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 20px;
+            pointer-events: none;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            background: var(--background);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--accent) 0%, #BE185D 100%);
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4);
+        }
+
+        /* 결과 리스트 */
+        .results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .results::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .results::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        .results::-webkit-scrollbar-thumb {
+            background: var(--surface-light);
+            border-radius: 4px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .results-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .results-count {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* 수영장 카드 */
+        .pool-card {
+            background: var(--surface-light);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pool-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.2);
+        }
+
+        .pool-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .pool-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .pool-number {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .pool-title {
+            flex: 1;
+        }
+
+        .pool-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .pool-address {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .distance-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--warning) 0%, #D97706 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .pool-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .info-item {
+            background: var(--background);
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-icon {
+            font-size: 18px;
+        }
+
+        .info-text {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .facilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .facility-tag {
+            background: rgba(79, 70, 229, 0.15);
+            color: var(--primary-light);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(79, 70, 229, 0.3);
+        }
+
+        /* 지도 */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: var(--background);
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .map-control-btn {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .map-control-btn:hover {
+            background: var(--surface-light);
+            border-color: var(--primary);
+            transform: translateX(-4px);
+        }
+
+        .map-control-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* 커스텀 마커 */
+        .custom-marker {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border: 3px solid white;
+            border-radius: 16px;
+            padding: 8px 16px;
+            font-weight: 700;
+            font-size: 13px;
+            color: white;
+            box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .marker-number {
+            background: rgba(255, 255, 255, 0.3);
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .marker-name {
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 로딩 & 정보 */
+        .info-text {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .info-icon-large {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 반응형 */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 360px;
+            }
+
+            .header-stats {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 50vh;
+            }
+
+            .map-controls {
+                bottom: 20px;
+                top: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">🏊</div>
+            <div class="logo-text">
+                <h1>SwimSeoul</h1>
+                <p>스마트한 수영장 검색 플랫폼</p>
+            </div>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-number" id="poolCount">53</span>
+                <span class="stat-label">수영장</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">9</span>
+                <span class="stat-label">지하철 노선</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="search-section">
+                <div class="section-title">🔍 위치 검색</div>
+                <div class="search-input-wrapper">
+                    <input
+                        type="text"
+                        class="search-input"
+                        id="searchAddress"
+                        placeholder="종로 경찰서, 강남역, 홍대입구..."
+                        onkeypress="if(event.keyCode==13) searchAddress()"
+                    >
+                    <span class="search-icon">🔍</span>
+                </div>
+
+                <div class="section-title" style="margin-top: 24px;">⚙️ 필터</div>
+                <div class="filter-grid">
+                    <select class="filter-select" id="radius">
+                        <option value="2">🎯 2km</option>
+                        <option value="3">🎯 3km</option>
+                        <option value="5" selected>🎯 5km</option>
+                        <option value="10">🎯 10km</option>
+                        <option value="15">🎯 15km</option>
+                        <option value="20">🎯 20km</option>
+                    </select>
+                    <select class="filter-select" id="maxPrice">
+                        <option value="">💰 전체 가격</option>
+                        <option value="5000">💰 ~5,000원</option>
+                        <option value="7000">💰 ~7,000원</option>
+                        <option value="10000">💰 ~10,000원</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="getCurrentLocation()">
+                    📍 현재 위치에서 검색
+                </button>
+                <button class="btn btn-secondary" onclick="searchSeoul()">
+                    🏙️ 서울 중심에서 검색
+                </button>
+            </div>
+
+            <div class="results" id="results">
+                <div class="info-text">
+                    <div class="info-icon-large">🗺️</div>
+                    <strong style="font-size: 16px; display: block; margin-bottom: 8px;">위치를 선택해주세요</strong>
+                    <p style="font-size: 14px;">검색하거나 지도를 클릭하세요</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div class="map-controls">
+                <button class="map-control-btn active" id="subwayToggle" onclick="toggleSubway()">
+                    🚇 지하철 노선
+                </button>
+                <button class="map-control-btn" onclick="map.setZoom(map.getZoom() + 1)">
+                    ➕ 확대
+                </button>
+                <button class="map-control-btn" onclick="map.setZoom(map.getZoom() - 1)">
+                    ➖ 축소
+                </button>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        const NOMINATIM_API = 'https://nominatim.openstreetmap.org/search';
+        let map;
+        let currentMarker;
+        let poolMarkers = [];
+        let subwayLayer = null;
+        let showSubway = true;
+
+        function initMap() {
+            map = L.map('map').setView([37.5665, 126.9780], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }).addTo(map);
+
+            addSubwayLayer();
+
+            map.on('click', function(e) {
+                searchPools(e.latlng.lat, e.latlng.lng);
+            });
+        }
+
+        function addSubwayLayer() {
+            subwayLayer = L.layerGroup();
+
+            const lineColors = {
+                '1호선': '#0052A4',
+                '2호선': '#00A84D',
+                '3호선': '#EF7C1C',
+                '4호선': '#00A5DE',
+                '5호선': '#996CAC',
+                '6호선': '#CD7C2F',
+                '7호선': '#747F00',
+                '8호선': '#E6186C',
+                '9호선': '#BDB092',
+            };
+
+            const subwayStations = [
+                // 1호선
+                {name: "서울역", lat: 37.5547, lng: 126.9707, line: '1호선'},
+                {name: "시청", lat: 37.5663, lng: 126.9779, line: '1호선'},
+                {name: "종각", lat: 37.5702, lng: 126.9828, line: '1호선'},
+                {name: "종로3가", lat: 37.5712, lng: 126.9910, line: '1호선'},
+                {name: "종로5가", lat: 37.5708, lng: 127.0053, line: '1호선'},
+                {name: "동대문", lat: 37.5711, lng: 127.0097, line: '1호선'},
+                {name: "신설동", lat: 37.5750, lng: 127.0252, line: '1호선'},
+
+                // 2호선
+                {name: "시청", lat: 37.5663, lng: 126.9779, line: '2호선'},
+                {name: "을지로입구", lat: 37.5657, lng: 126.9820, line: '2호선'},
+                {name: "을지로3가", lat: 37.5661, lng: 126.9912, line: '2호선'},
+                {name: "을지로4가", lat: 37.5668, lng: 126.9977, line: '2호선'},
+                {name: "동대문역사문화공원", lat: 37.5652, lng: 127.0079, line: '2호선'},
+                {name: "신당", lat: 37.5656, lng: 127.0179, line: '2호선'},
+                {name: "상왕십리", lat: 37.5656, lng: 127.0287, line: '2호선'},
+                {name: "왕십리", lat: 37.5612, lng: 127.0381, line: '2호선'},
+                {name: "한양대", lat: 37.5556, lng: 127.0445, line: '2호선'},
+                {name: "뚝섬", lat: 37.5467, lng: 127.0475, line: '2호선'},
+                {name: "성수", lat: 37.5446, lng: 127.0558, line: '2호선'},
+                {name: "건대입구", lat: 37.5404, lng: 127.0699, line: '2호선'},
+                {name: "구의", lat: 37.5370, lng: 127.0858, line: '2호선'},
+                {name: "강변", lat: 37.5350, lng: 127.0945, line: '2호선'},
+                {name: "잠실나루", lat: 37.5201, lng: 127.1026, line: '2호선'},
+                {name: "잠실", lat: 37.5133, lng: 127.1000, line: '2호선'},
+                {name: "잠실새내", lat: 37.5111, lng: 127.0863, line: '2호선'},
+                {name: "종합운동장", lat: 37.5109, lng: 127.0736, line: '2호선'},
+                {name: "삼성", lat: 37.5089, lng: 127.0632, line: '2호선'},
+                {name: "선릉", lat: 37.5045, lng: 127.0490, line: '2호선'},
+                {name: "역삼", lat: 37.5004, lng: 127.0364, line: '2호선'},
+                {name: "강남", lat: 37.4979, lng: 127.0276, line: '2호선'},
+                {name: "교대", lat: 37.4934, lng: 127.0142, line: '2호선'},
+                {name: "서초", lat: 37.4837, lng: 127.0058, line: '2호선'},
+                {name: "방배", lat: 37.4814, lng: 126.9968, line: '2호선'},
+                {name: "사당", lat: 37.4764, lng: 126.9813, line: '2호선'},
+                {name: "낙성대", lat: 37.4768, lng: 126.9632, line: '2호선'},
+                {name: "서울대입구", lat: 37.4813, lng: 126.9527, line: '2호선'},
+                {name: "봉천", lat: 37.4826, lng: 126.9426, line: '2호선'},
+                {name: "신림", lat: 37.4843, lng: 126.9297, line: '2호선'},
+                {name: "신대방", lat: 37.4871, lng: 126.9133, line: '2호선'},
+                {name: "구로디지털단지", lat: 37.4854, lng: 126.9013, line: '2호선'},
+                {name: "대림", lat: 37.4930, lng: 126.8957, line: '2호선'},
+                {name: "신도림", lat: 37.5088, lng: 126.8913, line: '2호선'},
+                {name: "문래", lat: 37.5176, lng: 126.8950, line: '2호선'},
+                {name: "영등포구청", lat: 37.5244, lng: 126.8961, line: '2호선'},
+                {name: "당산", lat: 37.5345, lng: 126.9024, line: '2호선'},
+                {name: "합정", lat: 37.5496, lng: 126.9139, line: '2호선'},
+                {name: "홍대입구", lat: 37.5563, lng: 126.9240, line: '2호선'},
+                {name: "신촌", lat: 37.5559, lng: 126.9367, line: '2호선'},
+                {name: "이대", lat: 37.5565, lng: 126.9458, line: '2호선'},
+                {name: "아현", lat: 37.5574, lng: 126.9567, line: '2호선'},
+                {name: "충정로", lat: 37.5599, lng: 126.9636, line: '2호선'},
+
+                // 3호선
+                {name: "대화", lat: 37.6583, lng: 126.7666, line: '3호선'},
+                {name: "연신내", lat: 37.6195, lng: 126.9211, line: '3호선'},
+                {name: "불광", lat: 37.6106, lng: 126.9290, line: '3호선'},
+                {name: "녹번", lat: 37.5996, lng: 126.9289, line: '3호선'},
+                {name: "홍제", lat: 37.5868, lng: 126.9514, line: '3호선'},
+                {name: "무악재", lat: 37.5792, lng: 126.9523, line: '3호선'},
+                {name: "독립문", lat: 37.5743, lng: 126.9567, line: '3호선'},
+                {name: "경복궁", lat: 37.5753, lng: 126.9730, line: '3호선'},
+                {name: "안국", lat: 37.5757, lng: 126.9851, line: '3호선'},
+                {name: "종로3가", lat: 37.5712, lng: 126.9910, line: '3호선'},
+                {name: "을지로3가", lat: 37.5661, lng: 126.9912, line: '3호선'},
+                {name: "충무로", lat: 37.5614, lng: 126.9945, line: '3호선'},
+                {name: "동대입구", lat: 37.5575, lng: 126.9949, line: '3호선'},
+                {name: "약수", lat: 37.5543, lng: 127.0099, line: '3호선'},
+                {name: "금호", lat: 37.5477, lng: 127.0173, line: '3호선'},
+                {name: "옥수", lat: 37.5403, lng: 127.0180, line: '3호선'},
+                {name: "압구정", lat: 37.5274, lng: 127.0285, line: '3호선'},
+                {name: "신사", lat: 37.5164, lng: 127.0206, line: '3호선'},
+                {name: "잠원", lat: 37.5135, lng: 127.0117, line: '3호선'},
+                {name: "고속터미널", lat: 37.5045, lng: 127.0045, line: '3호선'},
+                {name: "교대", lat: 37.4934, lng: 127.0142, line: '3호선'},
+                {name: "남부터미널", lat: 37.4762, lng: 127.0038, line: '3호선'},
+                {name: "양재", lat: 37.4842, lng: 127.0348, line: '3호선'},
+                {name: "매봉", lat: 37.4816, lng: 127.0446, line: '3호선'},
+                {name: "도곡", lat: 37.4913, lng: 127.0543, line: '3호선'},
+                {name: "대치", lat: 37.4945, lng: 127.0631, line: '3호선'},
+                {name: "학여울", lat: 37.4926, lng: 127.0730, line: '3호선'},
+                {name: "대청", lat: 37.4955, lng: 127.1037, line: '3호선'},
+                {name: "일원", lat: 37.4844, lng: 127.0880, line: '3호선'},
+                {name: "수서", lat: 37.4871, lng: 127.1011, line: '3호선'},
+                {name: "가락시장", lat: 37.4930, lng: 127.1185, line: '3호선'},
+                {name: "경찰병원", lat: 37.4969, lng: 127.1247, line: '3호선'},
+                {name: "오금", lat: 37.5021, lng: 127.1284, line: '3호선'},
+
+                // 4호선
+                {name: "당고개", lat: 37.6700, lng: 127.0903, line: '4호선'},
+                {name: "상계", lat: 37.6442, lng: 127.0736, line: '4호선'},
+                {name: "노원", lat: 37.6556, lng: 127.0606, line: '4호선'},
+                {name: "창동", lat: 37.6536, lng: 127.0467, line: '4호선'},
+                {name: "쌍문", lat: 37.6502, lng: 127.0321, line: '4호선'},
+                {name: "수유", lat: 37.6384, lng: 127.0257, line: '4호선'},
+                {name: "미아", lat: 37.6130, lng: 127.0249, line: '4호선'},
+                {name: "미아사거리", lat: 37.6099, lng: 127.0299, line: '4호선'},
+                {name: "길음", lat: 37.6035, lng: 127.0256, line: '4호선'},
+                {name: "성신여대입구", lat: 37.5927, lng: 127.0168, line: '4호선'},
+                {name: "한성대입구", lat: 37.5883, lng: 127.0059, line: '4호선'},
+                {name: "혜화", lat: 37.5821, lng: 127.0019, line: '4호선'},
+                {name: "동대문", lat: 37.5711, lng: 127.0097, line: '4호선'},
+                {name: "동대문역사문화공원", lat: 37.5652, lng: 127.0079, line: '4호선'},
+                {name: "충무로", lat: 37.5614, lng: 126.9945, line: '4호선'},
+                {name: "명동", lat: 37.5603, lng: 126.9860, line: '4호선'},
+                {name: "회현", lat: 37.5588, lng: 126.9781, line: '4호선'},
+                {name: "서울역", lat: 37.5547, lng: 126.9707, line: '4호선'},
+                {name: "숙대입구", lat: 37.5453, lng: 126.9663, line: '4호선'},
+                {name: "삼각지", lat: 37.5344, lng: 126.9733, line: '4호선'},
+                {name: "신용산", lat: 37.5298, lng: 126.9651, line: '4호선'},
+                {name: "이촌", lat: 37.5228, lng: 126.9697, line: '4호선'},
+                {name: "동작", lat: 37.5033, lng: 126.9769, line: '4호선'},
+                {name: "총신대입구", lat: 37.4863, lng: 126.9826, line: '4호선'},
+                {name: "사당", lat: 37.4764, lng: 126.9813, line: '4호선'},
+                {name: "남태령", lat: 37.4632, lng: 126.9891, line: '4호선'},
+
+                // 5호선
+                {name: "방화", lat: 37.5786, lng: 126.8126, line: '5호선'},
+                {name: "김포공항", lat: 37.5622, lng: 126.8014, line: '5호선'},
+                {name: "송정", lat: 37.5611, lng: 126.8225, line: '5호선'},
+                {name: "마곡", lat: 37.5605, lng: 126.8250, line: '5호선'},
+                {name: "발산", lat: 37.5585, lng: 126.8372, line: '5호선'},
+                {name: "우장산", lat: 37.5480, lng: 126.8341, line: '5호선'},
+                {name: "화곡", lat: 37.5414, lng: 126.8462, line: '5호선'},
+                {name: "까치산", lat: 37.5318, lng: 126.8465, line: '5호선'},
+                {name: "신정", lat: 37.5243, lng: 126.8564, line: '5호선'},
+                {name: "목동", lat: 37.5267, lng: 126.8751, line: '5호선'},
+                {name: "오목교", lat: 37.5243, lng: 126.8751, line: '5호선'},
+                {name: "양평", lat: 37.5242, lng: 126.8902, line: '5호선'},
+                {name: "영등포구청", lat: 37.5244, lng: 126.8961, line: '5호선'},
+                {name: "영등포시장", lat: 37.5269, lng: 126.9057, line: '5호선'},
+                {name: "신길", lat: 37.5174, lng: 126.9144, line: '5호선'},
+                {name: "여의도", lat: 37.5213, lng: 126.9244, line: '5호선'},
+                {name: "여의나루", lat: 37.5272, lng: 126.9326, line: '5호선'},
+                {name: "마포", lat: 37.5398, lng: 126.9486, line: '5호선'},
+                {name: "공덕", lat: 37.5449, lng: 126.9517, line: '5호선'},
+                {name: "애오개", lat: 37.5543, lng: 126.9560, line: '5호선'},
+                {name: "충정로", lat: 37.5599, lng: 126.9636, line: '5호선'},
+                {name: "서대문", lat: 37.5656, lng: 126.9665, line: '5호선'},
+                {name: "광화문", lat: 37.5708, lng: 126.9768, line: '5호선'},
+                {name: "종로3가", lat: 37.5712, lng: 126.9910, line: '5호선'},
+                {name: "을지로4가", lat: 37.5668, lng: 126.9977, line: '5호선'},
+                {name: "동대문역사문화공원", lat: 37.5652, lng: 127.0079, line: '5호선'},
+                {name: "청구", lat: 37.5604, lng: 127.0146, line: '5호선'},
+                {name: "신금호", lat: 37.5550, lng: 127.0226, line: '5호선'},
+                {name: "행당", lat: 37.5464, lng: 127.0370, line: '5호선'},
+                {name: "왕십리", lat: 37.5612, lng: 127.0381, line: '5호선'},
+                {name: "마장", lat: 37.5657, lng: 127.0458, line: '5호선'},
+                {name: "답십리", lat: 37.5663, lng: 127.0547, line: '5호선'},
+                {name: "장한평", lat: 37.5614, lng: 127.0644, line: '5호선'},
+                {name: "군자", lat: 37.5574, lng: 127.0793, line: '5호선'},
+                {name: "아차산", lat: 37.5566, lng: 127.0903, line: '5호선'},
+                {name: "광나루", lat: 37.5451, lng: 127.1034, line: '5호선'},
+                {name: "천호", lat: 37.5387, lng: 127.1239, line: '5호선'},
+                {name: "강동", lat: 37.5374, lng: 127.1354, line: '5호선'},
+                {name: "길동", lat: 37.5381, lng: 127.1439, line: '5호선'},
+                {name: "굽은다리", lat: 37.5373, lng: 127.1492, line: '5호선'},
+                {name: "명일", lat: 37.5465, lng: 127.1524, line: '5호선'},
+                {name: "고덕", lat: 37.5546, lng: 127.1544, line: '5호선'},
+                {name: "상일동", lat: 37.5620, lng: 127.1706, line: '5호선'},
+                {name: "강일", lat: 37.5605, lng: 127.1753, line: '5호선'},
+                {name: "미사", lat: 37.5619, lng: 127.1876, line: '5호선'},
+                {name: "하남풍산", lat: 37.5511, lng: 127.2175, line: '5호선'},
+                {name: "하남시청", lat: 37.5479, lng: 127.2252, line: '5호선'},
+                {name: "하남검단산", lat: 37.5432, lng: 127.2326, line: '5호선'},
+
+                // 6호선
+                {name: "응암", lat: 37.6021, lng: 126.9169, line: '6호선'},
+                {name: "역촌", lat: 37.5997, lng: 126.9284, line: '6호선'},
+                {name: "불광", lat: 37.6106, lng: 126.9290, line: '6호선'},
+                {name: "독바위", lat: 37.6147, lng: 126.9275, line: '6호선'},
+                {name: "연신내", lat: 37.6195, lng: 126.9211, line: '6호선'},
+                {name: "구산", lat: 37.6104, lng: 126.9186, line: '6호선'},
+                {name: "새절", lat: 37.5941, lng: 126.9123, line: '6호선'},
+                {name: "증산", lat: 37.5836, lng: 126.9025, line: '6호선'},
+                {name: "디지털미디어시티", lat: 37.5766, lng: 126.9008, line: '6호선'},
+                {name: "월드컵경기장", lat: 37.5686, lng: 126.8978, line: '6호선'},
+                {name: "마포구청", lat: 37.5664, lng: 126.9053, line: '6호선'},
+                {name: "망원", lat: 37.5555, lng: 126.9105, line: '6호선'},
+                {name: "합정", lat: 37.5496, lng: 126.9139, line: '6호선'},
+                {name: "상수", lat: 37.5475, lng: 126.9224, line: '6호선'},
+                {name: "광흥창", lat: 37.5475, lng: 126.9304, line: '6호선'},
+                {name: "대흥", lat: 37.5465, lng: 126.9389, line: '6호선'},
+                {name: "공덕", lat: 37.5449, lng: 126.9517, line: '6호선'},
+                {name: "효창공원앞", lat: 37.5392, lng: 126.9600, line: '6호선'},
+                {name: "삼각지", lat: 37.5344, lng: 126.9733, line: '6호선'},
+                {name: "녹사평", lat: 37.5340, lng: 126.9870, line: '6호선'},
+                {name: "이태원", lat: 37.5345, lng: 126.9945, line: '6호선'},
+                {name: "한강진", lat: 37.5318, lng: 127.0024, line: '6호선'},
+                {name: "버티고개", lat: 37.5313, lng: 127.0142, line: '6호선'},
+                {name: "약수", lat: 37.5543, lng: 127.0099, line: '6호선'},
+                {name: "청구", lat: 37.5604, lng: 127.0146, line: '6호선'},
+                {name: "신당", lat: 37.5656, lng: 127.0179, line: '6호선'},
+                {name: "동묘앞", lat: 37.5712, lng: 127.0159, line: '6호선'},
+                {name: "창신", lat: 37.5748, lng: 127.0175, line: '6호선'},
+                {name: "보문", lat: 37.5789, lng: 127.0183, line: '6호선'},
+                {name: "안암", lat: 37.5857, lng: 127.0296, line: '6호선'},
+                {name: "고려대", lat: 37.5870, lng: 127.0320, line: '6호선'},
+                {name: "월곡", lat: 37.5964, lng: 127.0449, line: '6호선'},
+                {name: "상월곡", lat: 37.5992, lng: 127.0577, line: '6호선'},
+                {name: "돌곶이", lat: 37.6108, lng: 127.0647, line: '6호선'},
+                {name: "석계", lat: 37.6151, lng: 127.0662, line: '6호선'},
+                {name: "태릉입구", lat: 37.6172, lng: 127.0745, line: '6호선'},
+                {name: "화랑대", lat: 37.6190, lng: 127.0797, line: '6호선'},
+                {name: "봉화산", lat: 37.6209, lng: 127.0861, line: '6호선'},
+                {name: "신내", lat: 37.6106, lng: 127.0922, line: '6호선'},
+
+                // 7호선
+                {name: "장암", lat: 37.6442, lng: 126.9964, line: '7호선'},
+                {name: "도봉산", lat: 37.6483, lng: 127.0125, line: '7호선'},
+                {name: "수락산", lat: 37.6374, lng: 127.0757, line: '7호선'},
+                {name: "마들", lat: 37.6331, lng: 127.0586, line: '7호선'},
+                {name: "노원", lat: 37.6556, lng: 127.0606, line: '7호선'},
+                {name: "중계", lat: 37.6408, lng: 127.0739, line: '7호선'},
+                {name: "하계", lat: 37.6367, lng: 127.0675, line: '7호선'},
+                {name: "공릉", lat: 37.6252, lng: 127.0721, line: '7호선'},
+                {name: "태릉입구", lat: 37.6172, lng: 127.0745, line: '7호선'},
+                {name: "먹골", lat: 37.6177, lng: 127.0883, line: '7호선'},
+                {name: "중화", lat: 37.6068, lng: 127.0835, line: '7호선'},
+                {name: "상봉", lat: 37.5962, lng: 127.0855, line: '7호선'},
+                {name: "면목", lat: 37.5878, lng: 127.0893, line: '7호선'},
+                {name: "사가정", lat: 37.5816, lng: 127.0891, line: '7호선'},
+                {name: "용마산", lat: 37.5744, lng: 127.0890, line: '7호선'},
+                {name: "중곡", lat: 37.5657, lng: 127.0871, line: '7호선'},
+                {name: "군자", lat: 37.5574, lng: 127.0793, line: '7호선'},
+                {name: "어린이대공원", lat: 37.5484, lng: 127.0748, line: '7호선'},
+                {name: "건대입구", lat: 37.5404, lng: 127.0699, line: '7호선'},
+                {name: "뚝섬유원지", lat: 37.5301, lng: 127.0664, line: '7호선'},
+                {name: "청담", lat: 37.5194, lng: 127.0528, line: '7호선'},
+                {name: "강남구청", lat: 37.5174, lng: 127.0413, line: '7호선'},
+                {name: "학동", lat: 37.5142, lng: 127.0317, line: '7호선'},
+                {name: "논현", lat: 37.5103, lng: 127.0220, line: '7호선'},
+                {name: "반포", lat: 37.5008, lng: 127.0112, line: '7호선'},
+                {name: "고속터미널", lat: 37.5045, lng: 127.0045, line: '7호선'},
+                {name: "내방", lat: 37.4989, lng: 126.9951, line: '7호선'},
+                {name: "이수", lat: 37.4873, lng: 126.9822, line: '7호선'},
+                {name: "남성", lat: 37.4747, lng: 126.9789, line: '7호선'},
+                {name: "숭실대입구", lat: 37.4966, lng: 126.9571, line: '7호선'},
+                {name: "상도", lat: 37.5022, lng: 126.9513, line: '7호선'},
+                {name: "장승배기", lat: 37.4768, lng: 126.9757, line: '7호선'},
+                {name: "신대방삼거리", lat: 37.4871, lng: 126.9133, line: '7호선'},
+                {name: "보라매", lat: 37.4937, lng: 126.9258, line: '7호선'},
+                {name: "신풍", lat: 37.4858, lng: 126.9241, line: '7호선'},
+                {name: "대림", lat: 37.4930, lng: 126.8957, line: '7호선'},
+                {name: "남구로", lat: 37.4940, lng: 126.8869, line: '7호선'},
+                {name: "가산디지털단지", lat: 37.4817, lng: 126.8825, line: '7호선'},
+                {name: "철산", lat: 37.4710, lng: 126.8468, line: '7호선'},
+                {name: "광명사거리", lat: 37.4766, lng: 126.8650, line: '7호선'},
+                {name: "천왕", lat: 37.4661, lng: 126.8356, line: '7호선'},
+                {name: "온수", lat: 37.4926, lng: 126.8258, line: '7호선'},
+                {name: "까치울", lat: 37.5014, lng: 126.8466, line: '7호선'},
+                {name: "부천종합운동장", lat: 37.5333, lng: 126.8251, line: '7호선'},
+                {name: "춘의", lat: 37.5435, lng: 126.8278, line: '7호선'},
+                {name: "신중동", lat: 37.5480, lng: 126.8104, line: '7호선'},
+                {name: "부천시청", lat: 37.5531, lng: 126.8013, line: '7호선'},
+                {name: "상동", lat: 37.5611, lng: 126.8225, line: '7호선'},
+                {name: "삼산체육관", lat: 37.5667, lng: 126.8244, line: '7호선'},
+                {name: "굴포천", lat: 37.5745, lng: 126.8267, line: '7호선'},
+                {name: "부평구청", lat: 37.5764, lng: 126.8327, line: '7호선'},
+
+                // 8호선
+                {name: "암사", lat: 37.5518, lng: 127.1284, line: '8호선'},
+                {name: "천호", lat: 37.5387, lng: 127.1239, line: '8호선'},
+                {name: "강동구청", lat: 37.5303, lng: 127.1242, line: '8호선'},
+                {name: "몽촌토성", lat: 37.5143, lng: 127.1209, line: '8호선'},
+                {name: "잠실", lat: 37.5133, lng: 127.1000, line: '8호선'},
+                {name: "석촌", lat: 37.5064, lng: 127.1054, line: '8호선'},
+                {name: "송파", lat: 37.5036, lng: 127.1118, line: '8호선'},
+                {name: "가락시장", lat: 37.4930, lng: 127.1185, line: '8호선'},
+                {name: "문정", lat: 37.4865, lng: 127.1224, line: '8호선'},
+                {name: "장지", lat: 37.4783, lng: 127.1255, line: '8호선'},
+                {name: "복정", lat: 37.4708, lng: 127.1264, line: '8호선'},
+                {name: "산성", lat: 37.4398, lng: 127.1461, line: '8호선'},
+                {name: "남한산성입구", lat: 37.4362, lng: 127.1643, line: '8호선'},
+                {name: "단대오거리", lat: 37.4470, lng: 127.1302, line: '8호선'},
+                {name: "신흥", lat: 37.4441, lng: 127.1152, line: '8호선'},
+                {name: "수진", lat: 37.4383, lng: 127.1012, line: '8호선'},
+                {name: "모란", lat: 37.4342, lng: 127.1270, line: '8호선'},
+
+                // 9호선
+                {name: "개화", lat: 37.5785, lng: 126.7996, line: '9호선'},
+                {name: "김포공항", lat: 37.5622, lng: 126.8014, line: '9호선'},
+                {name: "공항시장", lat: 37.5625, lng: 126.8186, line: '9호선'},
+                {name: "신방화", lat: 37.5595, lng: 126.8258, line: '9호선'},
+                {name: "마곡나루", lat: 37.5633, lng: 126.8279, line: '9호선'},
+                {name: "양천향교", lat: 37.5516, lng: 126.8397, line: '9호선'},
+                {name: "가양", lat: 37.5610, lng: 126.8550, line: '9호선'},
+                {name: "증미", lat: 37.5581, lng: 126.8680, line: '9호선'},
+                {name: "등촌", lat: 37.5506, lng: 126.8684, line: '9호선'},
+                {name: "염창", lat: 37.5460, lng: 126.8746, line: '9호선'},
+                {name: "신목동", lat: 37.5396, lng: 126.8804, line: '9호선'},
+                {name: "선유도", lat: 37.5358, lng: 126.8931, line: '9호선'},
+                {name: "당산", lat: 37.5345, lng: 126.9024, line: '9호선'},
+                {name: "국회의사당", lat: 37.5298, lng: 126.9175, line: '9호선'},
+                {name: "여의도", lat: 37.5213, lng: 126.9244, line: '9호선'},
+                {name: "샛강", lat: 37.5172, lng: 126.9272, line: '9호선'},
+                {name: "노량진", lat: 37.5138, lng: 126.9426, line: '9호선'},
+                {name: "노들", lat: 37.5121, lng: 126.9558, line: '9호선'},
+                {name: "흑석", lat: 37.5082, lng: 126.9613, line: '9호선'},
+                {name: "동작", lat: 37.5033, lng: 126.9769, line: '9호선'},
+                {name: "구반포", lat: 37.5028, lng: 126.9961, line: '9호선'},
+                {name: "신반포", lat: 37.5046, lng: 127.0056, line: '9호선'},
+                {name: "고속터미널", lat: 37.5045, lng: 127.0045, line: '9호선'},
+                {name: "사평", lat: 37.4967, lng: 127.0062, line: '9호선'},
+                {name: "신논현", lat: 37.5040, lng: 127.0254, line: '9호선'},
+                {name: "언주", lat: 37.5118, lng: 127.0344, line: '9호선'},
+                {name: "선정릉", lat: 37.5043, lng: 127.0490, line: '9호선'},
+                {name: "삼성중앙", lat: 37.5091, lng: 127.0629, line: '9호선'},
+                {name: "봉은사", lat: 37.5144, lng: 127.0632, line: '9호선'},
+                {name: "종합운동장", lat: 37.5109, lng: 127.0736, line: '9호선'},
+                {name: "삼전", lat: 37.5059, lng: 127.0829, line: '9호선'},
+                {name: "석촌고분", lat: 37.5038, lng: 127.0971, line: '9호선'},
+                {name: "석촌", lat: 37.5064, lng: 127.1054, line: '9호선'},
+                {name: "송파나루", lat: 37.5051, lng: 127.1093, line: '9호선'},
+                {name: "한성백제", lat: 37.5060, lng: 127.1157, line: '9호선'},
+                {name: "올림픽공원", lat: 37.5201, lng: 127.1214, line: '9호선'},
+                {name: "둔촌오륜", lat: 37.5260, lng: 127.1360, line: '9호선'},
+                {name: "중앙보훈병원", lat: 37.5384, lng: 127.1492, line: '9호선'},
+            ];
+
+            const lineStations = {};
+            subwayStations.forEach(station => {
+                if (!lineStations[station.line]) {
+                    lineStations[station.line] = [];
+                }
+                lineStations[station.line].push(station);
+            });
+
+            Object.keys(lineStations).forEach(lineName => {
+                const stations = lineStations[lineName];
+                const color = lineColors[lineName] || '#999999';
+                const coordinates = stations.map(s => [s.lat, s.lng]);
+
+                L.polyline(coordinates, {
+                    color: color,
+                    weight: 4,
+                    opacity: 0.7,
+                    smoothFactor: 1
+                }).addTo(subwayLayer);
+            });
+
+            subwayStations.forEach(station => {
+                const color = lineColors[station.line] || '#999999';
+                const marker = L.circleMarker([station.lat, station.lng], {
+                    radius: 4,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 1
+                });
+
+                marker.bindTooltip(`🚇 ${station.name}<br><small style="color: ${color};">${station.line}</small>`, {
+                    permanent: false,
+                    direction: 'top'
+                });
+
+                marker.addTo(subwayLayer);
+            });
+
+            subwayLayer.addTo(map);
+        }
+
+        function toggleSubway() {
+            const btn = document.getElementById('subwayToggle');
+            showSubway = !showSubway;
+
+            if (showSubway) {
+                subwayLayer.addTo(map);
+                btn.classList.add('active');
+            } else {
+                map.removeLayer(subwayLayer);
+                btn.classList.remove('active');
+            }
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                document.getElementById('results').innerHTML = '<div class="loading"><div class="loading-spinner"></div><p style="color: var(--text-muted);">위치를 찾는 중...</p></div>';
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        searchPools(position.coords.latitude, position.coords.longitude);
+                        map.setView([position.coords.latitude, position.coords.longitude], 13);
+                    },
+                    () => {
+                        alert('위치 정보를 가져올 수 없습니다.');
+                        document.getElementById('results').innerHTML = '<div class="info-text"><div class="info-icon-large">❌</div><p>위치 접근 실패</p></div>';
+                    }
+                );
+            }
+        }
+
+        function searchSeoul() {
+            searchPools(37.5665, 126.9780);
+            map.setView([37.5665, 126.9780], 12);
+        }
+
+        async function searchAddress() {
+            const address = document.getElementById('searchAddress').value.trim();
+            if (!address) {
+                alert('주소를 입력해주세요.');
+                return;
+            }
+
+            document.getElementById('results').innerHTML = '<div class="loading"><div class="loading-spinner"></div><p style="color: var(--text-muted);">주소 검색 중...</p></div>';
+
+            try {
+                const response = await fetch(`${NOMINATIM_API}?format=json&q=${encodeURIComponent(address + ' 대한민국')}&limit=5`);
+                const results = await response.json();
+
+                if (results.length === 0) {
+                    alert('주소를 찾을 수 없습니다.');
+                    return;
+                }
+
+                const lat = parseFloat(results[0].lat);
+                const lng = parseFloat(results[0].lon);
+                map.setView([lat, lng], 14);
+                searchPools(lat, lng);
+            } catch (error) {
+                alert('주소 검색 실패');
+            }
+        }
+
+        async function searchPools(lat, lng) {
+            const radius = parseFloat(document.getElementById('radius').value);
+            const maxPrice = document.getElementById('maxPrice').value;
+
+            if (currentMarker) map.removeLayer(currentMarker);
+
+            currentMarker = L.marker([lat, lng], {
+                icon: L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                })
+            }).addTo(map);
+
+            document.getElementById('results').innerHTML = '<div class="loading"><div class="loading-spinner"></div><p style="color: var(--text-muted);">수영장 검색 중...</p></div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/pools/search`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        lat: lat,
+                        lng: lng,
+                        radius_km: radius,
+                        max_price: maxPrice ? parseInt(maxPrice) : null,
+                        has_free_swim: true
+                    })
+                });
+
+                const pools = await response.json();
+                displayResults(pools, lat, lng);
+                displayMarkersOnMap(pools);
+            } catch (error) {
+                document.getElementById('results').innerHTML = '<div class="info-text"><div class="info-icon-large">❌</div><strong>서버 연결 실패</strong></div>';
+            }
+        }
+
+        function displayResults(pools, centerLat, centerLng) {
+            const resultsDiv = document.getElementById('results');
+
+            if (pools.length === 0) {
+                resultsDiv.innerHTML = '<div class="info-text"><div class="info-icon-large">😢</div><strong>근처에 수영장이 없습니다</strong><p>검색 반경을 늘려보세요</p></div>';
+                return;
+            }
+
+            let html = `
+                <div class="results-header">
+                    <div class="results-title">검색 결과</div>
+                    <div class="results-count">${pools.length}개</div>
+                </div>
+            `;
+
+            pools.forEach((pool, index) => {
+                const distance = calculateDistance(centerLat, centerLng, pool.lat, pool.lng);
+
+                html += `
+                    <div class="pool-card" onclick="focusPool(${pool.lat}, ${pool.lng})">
+                        ${pool.image_url ? `
+                            <img src="${pool.image_url}" alt="${pool.name}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px 12px 0 0; margin: -16px -16px 12px -16px;">
+                        ` : ''}
+                        <div class="pool-header">
+                            <div class="pool-number">${index + 1}</div>
+                            <div class="pool-title">
+                                <div class="pool-name">${pool.name}</div>
+                                <div class="pool-address">📍 ${pool.address}</div>
+                            </div>
+                        </div>
+                        ${pool.description ? `
+                            <div style="color: var(--text-muted); font-size: 14px; margin: 8px 0; line-height: 1.5;">${pool.description}</div>
+                        ` : ''}
+                        <div class="distance-badge">${distance.toFixed(1)}km</div>
+
+                        <div class="pool-info-grid">
+                            ${pool.daily_price ? `
+                                <div class="info-item">
+                                    <div class="info-icon">💰</div>
+                                    <div class="info-text">
+                                        <span class="info-label">1회 이용</span>
+                                        <div class="info-value">${pool.daily_price.toLocaleString()}원</div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            ${pool.free_swim_price ? `
+                                <div class="info-item">
+                                    <div class="info-icon">🏊</div>
+                                    <div class="info-text">
+                                        <span class="info-label">자율수영</span>
+                                        <div class="info-value">${pool.free_swim_price.toLocaleString()}원</div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        ${pool.facilities && pool.facilities.length > 0 ? `
+                            <div class="facilities">
+                                ${pool.facilities.slice(0, 4).map(f => `<div class="facility-tag">${f}</div>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function displayMarkersOnMap(pools) {
+            poolMarkers.forEach(marker => map.removeLayer(marker));
+            poolMarkers = [];
+
+            pools.forEach((pool, index) => {
+                const markerIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `
+                        <div class="custom-marker">
+                            <div class="marker-number">${index + 1}</div>
+                            <div class="marker-name">${pool.name}</div>
+                        </div>
+                    `,
+                    iconSize: [null, 35],
+                    iconAnchor: [80, 18],
+                });
+
+                const marker = L.marker([pool.lat, pool.lng], {icon: markerIcon}).addTo(map);
+
+                let popupContent = `
+                    <div style="min-width: 280px; padding: 8px;">
+                        <strong style="color: var(--primary); font-size: 16px;">${index + 1}. ${pool.name}</strong><br>
+                        <div style="margin-top: 8px; font-size: 13px; line-height: 1.8;">
+                            📍 ${pool.address}<br>
+                            ${pool.phone ? `📞 ${pool.phone}<br>` : ''}
+                            ${pool.daily_price ? `💰 ${pool.daily_price.toLocaleString()}원<br>` : ''}
+                            ${pool.free_swim_price ? `🏊 ${pool.free_swim_price.toLocaleString()}원` : ''}
+                        </div>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+                marker.on('mouseover', function() { this.openPopup(); });
+                poolMarkers.push(marker);
+            });
+
+            if (pools.length > 0) {
+                const bounds = L.latLngBounds(pools.map(p => [p.lat, p.lng]));
+                map.fitBounds(bounds, {padding: [50, 50]});
+            }
+        }
+
+        function focusPool(lat, lng) {
+            map.setView([lat, lng], 16);
+            poolMarkers.forEach(marker => {
+                if (Math.abs(marker.getLatLng().lat - lat) < 0.0001 &&
+                    Math.abs(marker.getLatLng().lng - lng) < 0.0001) {
+                    marker.openPopup();
+                }
+            });
+        }
+
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        window.onload = initMap;
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+nul
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Crawler data (optional - keep collected data)
+# crawler/pools_data.json
+# advanced_pools.json
+# collected_pools.json

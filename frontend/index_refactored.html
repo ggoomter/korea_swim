@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwimSeoul - 서울 수영장 검색 🏊</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">🏊</div>
+            <div class="logo-text">
+                <h1>SwimSeoul</h1>
+                <p>서울 수영장 통합 검색</p>
+            </div>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-number">0</span>
+                <span class="stat-label">수영장</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">25</span>
+                <span class="stat-label">구</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input
+                        type="text"
+                        class="search-input"
+                        id="address-search"
+                        placeholder="주소를 입력하세요 (예: 강남역, 종로구청)"
+                    >
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <button class="filter-btn active" id="filter-all">전체</button>
+                    <button class="filter-btn" id="filter-public">공공</button>
+                    <button class="filter-btn" id="filter-private">민간</button>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="search-radius">검색 반경</label>
+                        <select class="control-select" id="search-radius">
+                            <option value="3">3km</option>
+                            <option value="5" selected>5km</option>
+                            <option value="10">10km</option>
+                            <option value="20">20km</option>
+                        </select>
+                    </div>
+                    <button class="btn-secondary" id="search-seoul">📍 서울 중심에서 검색</button>
+                    <button class="btn-subway" id="toggle-subway">🚇 지하철 노선도</button>
+                </div>
+            </div>
+
+            <!-- Pool List -->
+            <div class="pool-list-container">
+                <div id="pool-list"></div>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Application JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

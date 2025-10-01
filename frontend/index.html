@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국 수영장 찾기 🏊</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 100px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            width: 400px;
+            background: white;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .search-box {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-box h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            padding: 20px;
+        }
+
+        .pool-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pool-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .pool-card h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .pool-info {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .pool-price {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .info-text {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .distance-badge {
+            display: inline-block;
+            background: #ffeaa7;
+            color: #2d3436;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏊 한국 수영장 찾기</h1>
+        <p>지도를 클릭하거나 주소를 검색하여 근처 수영장을 찾아보세요</p>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="search-box">
+                <h3>🔍 검색 옵션</h3>
+
+                <div class="input-group">
+                    <label>검색 반경</label>
+                    <select id="radius">
+                        <option value="3">3km</option>
+                        <option value="5" selected>5km</option>
+                        <option value="10">10km</option>
+                        <option value="15">15km</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>최대 가격 (1회 이용)</label>
+                    <select id="maxPrice">
+                        <option value="">제한 없음</option>
+                        <option value="5000">5,000원 이하</option>
+                        <option value="7000">7,000원 이하</option>
+                        <option value="10000">10,000원 이하</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="getCurrentLocation()">📍 현재 위치에서 찾기</button>
+            </div>
+
+            <div class="results" id="results">
+                <div class="info-text">
+                    👆 지도를 클릭하거나<br>
+                    현재 위치 버튼을 눌러주세요
+                </div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_API_KEY&libraries=services"></script>
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let map;
+        let currentMarker;
+        let poolMarkers = [];
+
+        // 카카오맵 초기화
+        function initMap() {
+            const container = document.getElementById('map');
+            const options = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 시청
+                level: 5
+            };
+
+            map = new kakao.maps.Map(container, options);
+
+            // 지도 클릭 이벤트
+            kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+                const latlng = mouseEvent.latLng;
+                searchPools(latlng.getLat(), latlng.getLng());
+            });
+
+            console.log('✅ 지도 초기화 완료');
+        }
+
+        // 현재 위치 가져오기
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                document.getElementById('results').innerHTML = '<div class="loading">📍 위치를 찾는 중...</div>';
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        searchPools(lat, lng);
+                        map.setCenter(new kakao.maps.LatLng(lat, lng));
+                    },
+                    (error) => {
+                        alert('위치 정보를 가져올 수 없습니다. 지도를 클릭해주세요.');
+                        document.getElementById('results').innerHTML = '<div class="info-text">지도를 클릭해주세요</div>';
+                    }
+                );
+            } else {
+                alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
+            }
+        }
+
+        // 수영장 검색
+        async function searchPools(lat, lng) {
+            const radius = parseFloat(document.getElementById('radius').value);
+            const maxPrice = document.getElementById('maxPrice').value;
+
+            // 검색 위치 마커 표시
+            if (currentMarker) {
+                currentMarker.setMap(null);
+            }
+
+            currentMarker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(lat, lng),
+                map: map
+            });
+
+            map.setCenter(new kakao.maps.LatLng(lat, lng));
+
+            // API 호출
+            document.getElementById('results').innerHTML = '<div class="loading">🔍 검색 중...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/pools/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        lat: lat,
+                        lng: lng,
+                        radius_km: radius,
+                        max_price: maxPrice ? parseInt(maxPrice) : null,
+                        has_free_swim: true
+                    })
+                });
+
+                const pools = await response.json();
+                displayResults(pools, lat, lng);
+                displayMarkersOnMap(pools);
+
+            } catch (error) {
+                console.error('검색 오류:', error);
+                document.getElementById('results').innerHTML = `
+                    <div class="info-text" style="color: red;">
+                        ❌ 서버 연결 실패<br>
+                        <small>API 서버가 실행 중인지 확인하세요</small>
+                    </div>
+                `;
+            }
+        }
+
+        // 검색 결과 표시
+        function displayResults(pools, centerLat, centerLng) {
+            const resultsDiv = document.getElementById('results');
+
+            if (pools.length === 0) {
+                resultsDiv.innerHTML = '<div class="info-text">😢 근처에 수영장이 없습니다</div>';
+                return;
+            }
+
+            let html = `<h3 style="margin-bottom: 15px; color: #333;">📋 ${pools.length}개 수영장 발견</h3>`;
+
+            pools.forEach((pool, index) => {
+                const distance = calculateDistance(centerLat, centerLng, pool.lat, pool.lng);
+
+                html += `
+                    <div class="pool-card" onclick="focusPool(${pool.lat}, ${pool.lng})">
+                        <h4>${index + 1}. ${pool.name}</h4>
+                        <div class="pool-info">📍 ${pool.address}</div>
+                        ${pool.phone ? `<div class="pool-info">📞 ${pool.phone}</div>` : ''}
+                        ${pool.daily_price ? `<div class="pool-info">💰 1회: ${pool.daily_price.toLocaleString()}원</div>` : ''}
+                        ${pool.free_swim_price ? `<div class="pool-info">🏊 자율수영: ${pool.free_swim_price.toLocaleString()}원</div>` : ''}
+                        <span class="distance-badge">${distance.toFixed(1)}km</span>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // 지도에 마커 표시
+        function displayMarkersOnMap(pools) {
+            // 기존 마커 제거
+            poolMarkers.forEach(marker => marker.setMap(null));
+            poolMarkers = [];
+
+            // 새 마커 추가
+            pools.forEach((pool, index) => {
+                const marker = new kakao.maps.Marker({
+                    position: new kakao.maps.LatLng(pool.lat, pool.lng),
+                    map: map,
+                    title: pool.name
+                });
+
+                // 인포윈도우
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: `
+                        <div style="padding: 10px; min-width: 200px;">
+                            <strong>${pool.name}</strong><br>
+                            ${pool.free_swim_price ? `자율수영: ${pool.free_swim_price.toLocaleString()}원` : ''}
+                        </div>
+                    `
+                });
+
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    infowindow.open(map, marker);
+                });
+
+                poolMarkers.push(marker);
+            });
+        }
+
+        // 수영장 위치로 이동
+        function focusPool(lat, lng) {
+            map.setCenter(new kakao.maps.LatLng(lat, lng));
+            map.setLevel(3);
+        }
+
+        // 거리 계산 (Haversine)
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371; // 지구 반경 (km)
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // 페이지 로드 시 지도 초기화
+        window.onload = initMap;
+    </script>
+</body>
+</html>
