@@ -1,0 +1,137 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "name": "강남구민체육센터 수영장",
+      "status": "failed",
+      "reason": "wrong URL - Q&A page, not pricing page"
+    },
+    {
+      "id": 2,
+      "name": "대치1동 구민체육센터",
+      "status": "failed",
+      "reason": "no price information on page"
+    },
+    {
+      "id": 3,
+      "name": "강동구민회관 수영장",
+      "status": "success",
+      "monthly_lesson_price": "모닝수영: 38,500~55,000원 (시간대별), 남여수영: 55,000원",
+      "free_swim_price": "프로그램별 상이"
+    },
+    {
+      "id": 4,
+      "name": "천호체육관 수영장",
+      "status": "failed",
+      "reason": "2025년 신규 개장, no price information"
+    },
+    {
+      "id": 5,
+      "name": "강북구민체육센터",
+      "status": "failed",
+      "reason": "JavaScript anti-bot protection"
+    },
+    {
+      "id": 6,
+      "name": "강서구민체육센터",
+      "status": "partial",
+      "monthly_lesson_price": "월정기권 30,000~56,000원, 일반수영 46,200원",
+      "free_swim_price": "41,700~180,000원"
+    },
+    {
+      "id": 7,
+      "name": "관악구민체육센터",
+      "status": "partial",
+      "monthly_lesson_price": "정보 없음",
+      "free_swim_price": "일일입장 3,400원 (2시간)"
+    },
+    {
+      "id": 8,
+      "name": "광진구민체육센터",
+      "status": "success",
+      "monthly_lesson_price": "정보 없음 (문의 필요)",
+      "free_swim_price": "성인 3,500원, 청소년 2,500원, 어린이 2,000원"
+    },
+    {
+      "id": 9,
+      "name": "구로구민체육센터",
+      "status": "failed",
+      "reason": "no price information on page"
+    },
+    {
+      "id": 10,
+      "name": "금천구민체육센터",
+      "status": "failed",
+      "reason": "no price information on page"
+    },
+    {
+      "id": 11,
+      "name": "노원구민체육관",
+      "status": "failed",
+      "reason": "no price information on page"
+    },
+    {
+      "id": 12,
+      "name": "도봉구민회관 수영장",
+      "status": "partial",
+      "monthly_lesson_price": "새벽수영: 성인 주3회 48,400원, 주2회 32,300원",
+      "free_swim_price": "정보 없음"
+    },
+    {
+      "id": 13,
+      "name": "동대문구민체육센터",
+      "status": "failed",
+      "reason": "SSL certificate error"
+    },
+    {
+      "id": 14,
+      "name": "동작구민체육센터",
+      "status": "failed",
+      "reason": "no price information on page"
+    },
+    {
+      "id": 15,
+      "name": "마포구민체육센터",
+      "status": "failed",
+      "reason": "SSL certificate expired"
+    },
+    {
+      "id": 16,
+      "name": "서대문구민체육센터",
+      "status": "failed",
+      "reason": "프로그램별 상이, 문의 필요"
+    },
+    {
+      "id": 17,
+      "name": "서초구민체육센터",
+      "status": "success",
+      "monthly_lesson_price": "유아 31,000원, 성인 43,000~76,000원, 소그룹 160,000원",
+      "free_swim_price": "정보 없음"
+    },
+    {
+      "id": 18,
+      "name": "성동구민체육센터",
+      "status": "failed",
+      "reason": "no price information on page"
+    },
+    {
+      "id": 19,
+      "name": "성북구민체육센터",
+      "status": "failed",
+      "reason": "no price information on page"
+    },
+    {
+      "id": 20,
+      "name": "송파구민체육센터",
+      "status": "failed",
+      "reason": "no price information on page"
+    }
+  ],
+  "summary": {
+    "total_processed": 20,
+    "success": 4,
+    "partial": 3,
+    "failed": 13,
+    "success_rate": "20%"
+  }
+}

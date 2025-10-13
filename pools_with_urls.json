@@ -1,0 +1,587 @@
+[
+  {
+    "id": 1,
+    "name": "강남구민체육센터 수영장",
+    "url": "https://life.gangnam.go.kr/fmcs/63?action-value=dbb6e4d860c490948f61ebe14efbe8d5&action=read"
+  },
+  {
+    "id": 2,
+    "name": "대치1동 구민체육센터",
+    "url": "https://www.gangnam.go.kr/center/contents/center_edu_3220049/1/view.do?mid=MC0602&office=3220049"
+  },
+  {
+    "id": 3,
+    "name": "강동구민회관 수영장",
+    "url": "https://online.igangdong.or.kr/lecture/list.do"
+  },
+  {
+    "id": 4,
+    "name": "천호체육관 수영장",
+    "url": "https://www.gangdong.go.kr/web/culture/contents/gdc035_050_018"
+  },
+  {
+    "id": 5,
+    "name": "강북구민체육센터",
+    "url": "https://www.gangbuk.go.kr/portal/bbs/B0000142/view.do?nttId=128653&menuNo=200625"
+  },
+  {
+    "id": 6,
+    "name": "강서구민체육센터",
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=684"
+  },
+  {
+    "id": 7,
+    "name": "관악구민체육센터",
+    "url": "https://www.gwanakgongdan.or.kr/www/1399?action=read&action-value=e29032c52a37c276de84283f025cb798"
+  },
+  {
+    "id": 8,
+    "name": "광진구민체육센터",
+    "url": "https://booking.gwangjin.or.kr/fmcs/102?action=read&action-value=07440e52e2bec98d52dbc8618a103e04"
+  },
+  {
+    "id": 9,
+    "name": "구로구민체육센터",
+    "url": "https://www.gurosisul.or.kr/mod.asp?m=business&s=b01"
+  },
+  {
+    "id": 10,
+    "name": "금천구민체육센터",
+    "url": "https://www.gfmc.kr/page/business/sub05_030101.php"
+  },
+  {
+    "id": 11,
+    "name": "노원구민체육관",
+    "url": "https://www.nowonsc.kr/fmcs/498"
+  },
+  {
+    "id": 12,
+    "name": "도봉구민회관 수영장",
+    "url": "https://yeyak.dobongsiseol.or.kr/lecture/index.php?c_id=02&n_type=lecture"
+  },
+  {
+    "id": 13,
+    "name": "동대문구민체육센터",
+    "url": "https://www.dfmc.kr:8443/course/sports/fmcs/121"
+  },
+  {
+    "id": 14,
+    "name": "동작구민체육센터",
+    "url": "https://sports.idongjak.or.kr/home/40"
+  },
+  {
+    "id": 15,
+    "name": "마포구민체육센터",
+    "url": "http://www.maposc.or.kr/"
+  },
+  {
+    "id": 16,
+    "name": "서대문구민체육센터",
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=1040"
+  },
+  {
+    "id": 17,
+    "name": "서초구민체육센터",
+    "url": "https://www.seocho.go.kr/sports/fmcs/98"
+  },
+  {
+    "id": 18,
+    "name": "성동구민체육센터",
+    "url": "https://sports.happysd.or.kr/fmcs/3"
+  },
+  {
+    "id": 19,
+    "name": "성북구민체육센터",
+    "url": "https://www.gongdan.go.kr/portal/main/contents.do?menuNo=400120"
+  },
+  {
+    "id": 20,
+    "name": "송파구민체육센터",
+    "url": "https://www.songpa.go.kr/culture/contents.do?key=5396"
+  },
+  {
+    "id": 21,
+    "name": "잠실학생체육관",
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=950"
+  },
+  {
+    "id": 22,
+    "name": "올림픽공원 수영장",
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=982"
+  },
+  {
+    "id": 23,
+    "name": "양천구민체육센터",
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=1233"
+  },
+  {
+    "id": 24,
+    "name": "영등포구민체육센터",
+    "url": "https://www.ydp.go.kr/www/contents.do?key=2919&"
+  },
+  {
+    "id": 25,
+    "name": "용산구민체육센터",
+    "url": "https://www.yongsan.go.kr/portal/main/contents.do?menuNo=201235"
+  },
+  {
+    "id": 26,
+    "name": "은평구민체육센터",
+    "url": "https://www.efmc.or.kr/fmcs/8"
+  },
+  {
+    "id": 27,
+    "name": "종로구민체육센터",
+    "url": "https://www.ijongno.co.kr/fmcs/29"
+  },
+  {
+    "id": 28,
+    "name": "중구구민체육센터",
+    "url": "https://www.e-junggu.or.kr/fmcs/314?action=list&facilities_type=C&base_date=20250501&center=JUNGGU01&type=&part=08&place=4"
+  },
+  {
+    "id": 29,
+    "name": "중랑구민체육센터",
+    "url": "https://www.jungnangimc.or.kr/html/01010100"
+  },
+  {
+    "id": 30,
+    "name": "부산시민수영장",
+    "url": "https://sports.dongnae.go.kr/subpage/index/23"
+  },
+  {
+    "id": 31,
+    "name": "사직수영장",
+    "url": "https://www.busan.go.kr/sports/main/3?action=view&no=132"
+  },
+  {
+    "id": 32,
+    "name": "대구시민수영장",
+    "url": "https://council.daegu.go.kr/kr/activity/free?reform=view&uid=CBF884CE7AE5781F0648E7A4AD657F40"
+  },
+  {
+    "id": 33,
+    "name": "인천문학수영장",
+    "url": "https://www.incheon.go.kr/health/HE050220"
+  },
+  {
+    "id": 34,
+    "name": "인천도원수영장",
+    "url": "https://cbswim.webflow.io/suyeongjang/inceondoweonsuyeongjang"
+  },
+  {
+    "id": 35,
+    "name": "광주 남구체육관 수영장",
+    "url": "http://namgusports.kr/49/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=28788952&t=board"
+  },
+  {
+    "id": 36,
+    "name": "대전 대덕구체육관 수영장",
+    "url": "http://www.dd1318.com/index.php?mid=board_XjUz17&pMonth=0"
+  },
+  {
+    "id": 37,
+    "name": "울산문수수영장",
+    "url": "https://www.ulsan.go.kr/tour/kor/unit/attrctn/view.do?mId=001002008000000000&unqId=40"
+  },
+  {
+    "id": 38,
+    "name": "삼성 래미안 수영장",
+    "url": "https://www2.neonet.co.kr/novo-rebank/view/community/CommunityDetail.neo?comm_gbn=common&board_gbn=P&id=647578"
+  },
+  {
+    "id": 40,
+    "name": "롯데월드 아쿠아리움 수영장",
+    "url": "https://tour.interpark.com/freeya/Spot/View.aspx?SpotNo=125299"
+  },
+  {
+    "id": 41,
+    "name": "천호 아쿠아밸리",
+    "url": "https://sugang.igangdong.or.kr/information/prg/01010000"
+  },
+  {
+    "id": 42,
+    "name": "타임스퀘어 수영장",
+    "url": "https://curisin.relaxspace.kr/seoul/20-top-%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C-%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC-%EC%98%81%EB%93%B1%ED%8F%AC%EB%8F%994%EA%B0%80-%EC%88%98%EC%98%81%EC%9E%A5-%EC%95%88%EB%82%B4/"
+  },
+  {
+    "id": 43,
+    "name": "홍대 스포츠컴플렉스",
+    "url": "https://www.mfac.or.kr/mapoArt/f/jsp/facilities/sportMac.jsp"
+  },
+  {
+    "id": 44,
+    "name": "신세계백화점 강남점 수영장",
+    "url": "https://www.shinsegae.com/culture/academy/about.do?tapCode="
+  },
+  {
+    "id": 45,
+    "name": "구로 디지털밸리 수영장",
+    "url": "https://kr.hotels.com/de1805755-am128/hangug-seoul-gulo-dijiteol-danji-geoncheo-suyeongjang-hotel/"
+  },
+  {
+    "id": 46,
+    "name": "마곡 LG아트센터 수영장",
+    "url": "https://www.lgart.com/theaterguide/location"
+  },
+  {
+    "id": 47,
+    "name": "롯데마트 노원점 수영장",
+    "url": "https://www.nowonsc.kr/fmcs/52?action=read&action-value=212474622684d7aebefccfd5db52f5b7"
+  },
+  {
+    "id": 48,
+    "name": "소귀골백운산장",
+    "url": "https://www.diningcode.com/profile.php?rid=l6TYbdZbe9jw"
+  },
+  {
+    "id": 49,
+    "name": "서울북한산럭셔리카라반&amp;수영장글램핑",
+    "url": "https://bookhansan.campingt.me/"
+  },
+  {
+    "id": 50,
+    "name": "노보텔 앰배서더 서울 강남",
+    "url": "https://www.ambatel.com/novotel/Gangnam/ko/facilitiesView.do?facilities_contents_seq=34"
+  },
+  {
+    "id": 51,
+    "name": "반얀트리 클럽 앤 스파 서울",
+    "url": "https://www.banyantreeclub.com/"
+  },
+  {
+    "id": 52,
+    "name": "롯데시티호텔 마포",
+    "url": "https://www.lottehotel.com/mapo-city/ko/facilities/in-door-swimming-pool"
+  },
+  {
+    "id": 53,
+    "name": "올림픽수영장",
+    "url": "https://www.ksponco.or.kr/sports/olparkswim"
+  },
+  {
+    "id": 54,
+    "name": "뚝섬 한강공원 수영장",
+    "url": "https://hangang.seoul.go.kr/www/rvrPhoto/detail.do?photoSn=232&mid=490&pageNo=1&perPageCnt=&keyword=&opt1=&opt2=&opt3=&opt4=&opt5=&opt6=&opt7=&opt8=&opt9=&opt10=&opt11=&opt12="
+  },
+  {
+    "id": 56,
+    "name": "은평청여울수영장",
+    "url": "https://www.efmc.or.kr/File/ae33c14858ab39bb323413b8b093c92a"
+  },
+  {
+    "id": 57,
+    "name": "성일스포렉스 피트니스",
+    "url": "https://swimmingis.com/detail/32"
+  },
+  {
+    "id": 58,
+    "name": "신길종합사회복지관",
+    "url": "http://www.singil.org/bbs/content.php?co_id=facility"
+  },
+  {
+    "id": 59,
+    "name": "시립서대문청소년센터",
+    "url": "https://www.fun1318.or.kr/2021/edu/sport_view_new.php?gn2=156&gn3=166"
+  },
+  {
+    "id": 60,
+    "name": "노블레스타워 실버타운",
+    "url": "https://archive.chosun.com/pdf/i_service/pdf_ReadBody_s.jsp?ID=2025090403002BD204"
+  },
+  {
+    "id": 61,
+    "name": "시립동대문청소년센터",
+    "url": "https://www.ddmy.or.kr/bbs/content.php?co_id=class_01"
+  },
+  {
+    "id": 62,
+    "name": "효창종합사회복지관",
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=1132"
+  },
+  {
+    "id": 64,
+    "name": "더논현스포츠센터",
+    "url": "https://thenhsports.imweb.me/"
+  },
+  {
+    "id": 65,
+    "name": "홍제스포렉스",
+    "url": "https://learns.academy/academies/d85270c6-27c4-4b00-8dff-132215e7aa8f"
+  },
+  {
+    "id": 66,
+    "name": "서일체육문화센터",
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=1474"
+  },
+  {
+    "id": 67,
+    "name": "프레이저 플레이스 센트럴 서울",
+    "url": "https://www.booking.com/hotel/kr/fraser-place-central-seoul.ko.html"
+  },
+  {
+    "id": 68,
+    "name": "UH 스위트 더 서울",
+    "url": "https://www.booking.com/hotel/kr/uh-suite-the-seoul-seoul.ko.html"
+  },
+  {
+    "id": 69,
+    "name": "리얼스윔아카데미 덕수궁 디팰리스",
+    "url": "https://learns.academy/academies/b9b9f3ca-0ee2-4dd2-a737-abdc70fc8e9a"
+  },
+  {
+    "id": 70,
+    "name": "광화문광장",
+    "url": "https://www.sedaily.com/NewsView/29TAEO56KD"
+  },
+  {
+    "id": 71,
+    "name": "서울YWCA스포츠센터",
+    "url": "https://www.google.com/maps/search/%EC%84%9C%EC%9A%B8YWCA%EC%8A%A4%ED%8F%AC%EC%B8%A0%EC%84%BC%ED%84%B0+%EC%A4%91%EA%B5%AC+%EC%9D%84%EC%A7%80%EB%A1%9C4%EA%B0%80+%EC%88%98%EC%98%81%EC%9E%A5"
+  },
+  {
+    "id": 72,
+    "name": "오션베이비 대방센터",
+    "url": "https://learns.academy/academies/9d3f063e-5f47-4dde-b681-598e6800cff4"
+  },
+  {
+    "id": 73,
+    "name": "충무스포츠센터 수영장",
+    "url": "https://www.e-junggu.or.kr/fmcs/40"
+  },
+  {
+    "id": 74,
+    "name": "하이풀스포츠 x 온마인드 심리상담센터 롯데몰 은평점",
+    "url": "https://babygo.kr/place/27d89523-b0d0-46d2-afb9-b6ab8d9fb7db"
+  },
+  {
+    "id": 75,
+    "name": "포이스포츠센터",
+    "url": "https://suwimi.com/poolinfo/poolinfoDetail?pbid=377"
+  },
+  {
+    "id": 76,
+    "name": "불광스포렉스",
+    "url": "https://bams92.tistory.com/29"
+  },
+  {
+    "id": 78,
+    "name": "로얄마린 은평점",
+    "url": "https://learns.academy/academies/09587406-acc1-4a89-b54e-11c90b105441"
+  },
+  {
+    "id": 80,
+    "name": "슈퍼스타스위밍아카데미 마곡센터",
+    "url": "https://learns.academy/academies/e0c0b991-4269-4954-a256-dafe2506ffc1"
+  },
+  {
+    "id": 81,
+    "name": "에스에이치스포츠아카데미",
+    "url": "https://learns.academy/academies/e6ca0015-d1ff-434a-96b4-6bbcf2c4ae20"
+  },
+  {
+    "id": 82,
+    "name": "골근위수영뷰티아카데미학원 청담",
+    "url": "https://www.weacademy2008.co.kr/cen/cen1_8.asp"
+  },
+  {
+    "id": 83,
+    "name": "와우스포츠아카데미",
+    "url": "https://learns.academy/academies/fad8e96a-9eea-4de1-a91b-cfcc537b2103"
+  },
+  {
+    "id": 84,
+    "name": "그라모스호텔",
+    "url": "https://www.tripadvisor.co.kr/Hotel_Feature-g294197-d4137680-zft6217-Hotel_Grammos.html"
+  },
+  {
+    "id": 85,
+    "name": "녹스부띠끄관광호텔",
+    "url": "https://place.udanax.org/place.php?placeName=%EB%85%B9%EC%8A%A4%EB%B6%80%EB%9D%A0%EB%81%84%EA%B4%80%EA%B4%91%ED%98%B8%ED%85%94&id=953190"
+  },
+  {
+    "id": 87,
+    "name": "워터웍스 짐앤풀",
+    "url": "http://pf.kakao.com/_NUxjfG"
+  },
+  {
+    "id": 89,
+    "name": "키즈토피아 어린이수영장",
+    "url": "https://learns.academy/academies/1f0b321e-28e1-4b4d-8396-207ba4e09a8b"
+  },
+  {
+    "id": 90,
+    "name": "고덕어울림수영장",
+    "url": "https://www.igangdong.or.kr/page/ch/ch_1201.asp"
+  },
+  {
+    "id": 92,
+    "name": "강동유소년스포츠센터",
+    "url": "https://www.igangdong.or.kr/page/ch/ch_0601.asp"
+  },
+  {
+    "id": 93,
+    "name": "천호어울림수영장",
+    "url": "https://www.igangdong.or.kr/page/ch/ch_1401.asp"
+  },
+  {
+    "id": 94,
+    "name": "광나루 한강공원 수영장",
+    "url": "https://hangang.seoul.go.kr/www/rvrPhoto/detail.do?photoSn=82&mid=490&perPageCnt=8&keyword=&opt1=&opt2=&opt3=&opt4=&opt5=&opt6=&opt7=&opt8=&opt9=&opt10=DESC&opt11=&opt12=Y&pageNo=1"
+  },
+  {
+    "id": 95,
+    "name": "오션키즈강동점",
+    "url": "https://learns.academy/academies/d958209a-381f-404c-9444-a3357b3b211f"
+  },
+  {
+    "id": 96,
+    "name": "강북문화예술회관수영장",
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=820"
+  },
+  {
+    "id": 97,
+    "name": "강북종합체육센터",
+    "url": "https://www.sports-island-gb.co.kr/Gangbuk/center/"
+  },
+  {
+    "id": 98,
+    "name": "혜화여자고등학교실내수영장",
+    "url": "https://pf.kakao.com/_Hdzxmb/95029126"
+  },
+  {
+    "id": 100,
+    "name": "물빛수영장",
+    "url": "https://www.gongdan.go.kr/portal/main/contents.do?menuNo=400615"
+  },
+  {
+    "id": 101,
+    "name": "노블스위밍랩 길음점",
+    "url": "https://learns.academy/academies/f87ed7fb-5368-4c69-95d3-2452a9149acf"
+  },
+  {
+    "id": 102,
+    "name": "창동문화체육센터수영장",
+    "url": "https://yeyak.dobongsiseol.or.kr/lecture/?c_id=01&event_code=001&n_type=lecture"
+  },
+  {
+    "id": 103,
+    "name": "머큐어 서울 마곡",
+    "url": "https://all.accor.com/hotel/C0G5/index.ko.shtml"
+  },
+  {
+    "id": 104,
+    "name": "SR호텔 마곡",
+    "url": "https://hotel-sr.co.kr/"
+  },
+  {
+    "id": 105,
+    "name": "아쿠아웨이브",
+    "url": "https://www.da-gym.co.kr/detail/676c9598a49abf001df44160"
+  },
+  {
+    "id": 106,
+    "name": "강서구민올림픽체육센터수영장",
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=684"
+  },
+  {
+    "id": 107,
+    "name": "마곡레포츠센터수영장",
+    "url": "https://www.gangseo.seoul.kr/munhwa/mh040203"
+  },
+  {
+    "id": 108,
+    "name": "URBAN HOTEL GOLF 신림직영점",
+    "url": "https://kr.trip.com/hotels/seoul-hotel-detail-6399671/urban-hotelplay/"
+  },
+  {
+    "id": 109,
+    "name": "아쿠아플럭스",
+    "url": "https://winner.nahuaction.kr/seoul/%EA%B4%80%EC%95%85%EA%B5%AC-%EC%88%98%EC%98%81%EC%9E%A5-5%EA%B3%B3-%ED%95%9C%EB%88%88%EC%97%90-%EB%B3%B4%EA%B8%B0/"
+  },
+  {
+    "id": 110,
+    "name": "삼모스포렉스",
+    "url": "https://www.sammo.co.kr/sporex/swim.php"
+  },
+  {
+    "id": 111,
+    "name": "관악구민종합체육센터",
+    "url": "https://booking.gwanakgongdan.or.kr/booking/1536"
+  },
+  {
+    "id": 112,
+    "name": "신림체육센터수영장",
+    "url": "https://www.gwanakgongdan.or.kr/booking/1542"
+  },
+  {
+    "id": 113,
+    "name": "몬스터키즈풀",
+    "url": "https://www.114.co.kr/search/detail?comp_id=2673254&comp_tp_cd=TEL&upjong_cd=892211"
+  },
+  {
+    "id": 114,
+    "name": "삼육스포츠센터 수영장",
+    "url": "https://learns.academy/academies/44acf8dc-c6e9-4000-b486-86a6f99d149a"
+  },
+  {
+    "id": 115,
+    "name": "풀만 앰배서더 서울 이스트폴",
+    "url": "https://all.accor.com/hotel/C173/index.ko.shtml"
+  },
+  {
+    "id": 117,
+    "name": "뚝섬한강공원 눈썰매장",
+    "url": "https://korean.visitseoul.net/area/%EB%9A%9D%EC%84%AC-%ED%95%9C%EA%B0%95%EA%B3%B5%EC%9B%90-%EC%88%98%EC%98%81%EC%9E%A5/KOP005750"
+  },
+  {
+    "id": 118,
+    "name": "광진문화예술회관",
+    "url": "https://booking.gwangjin.or.kr/fmcs/102?action=read&action-value=c12957df42826f1508a86ef108295670"
+  },
+  {
+    "id": 119,
+    "name": "그랜드 워커힐 서울호텔수영장",
+    "url": "https://www.ktourmap.com/spotDetails.jsp?contentId=131610"
+  },
+  {
+    "id": 120,
+    "name": "워커힐 호텔 리버파크",
+    "url": "https://www.walkerhill.com/grandwalkerhillseoul/activity/RiverPark"
+  },
+  {
+    "id": 121,
+    "name": "정립회관수영장",
+    "url": "http://www.jeongnip.or.kr/sub02/sub01.php"
+  },
+  {
+    "id": 122,
+    "name": "오션키즈광진구의점",
+    "url": "https://learns.academy/academies/974de532-975e-45f9-9102-27cd6874d788"
+  },
+  {
+    "id": 123,
+    "name": "찬스아이수영장",
+    "url": "https://learns.academy/academies/c276540a-6138-4dea-a153-22f0cadc3c0e"
+  },
+  {
+    "id": 124,
+    "name": "리얼스위밍스쿨",
+    "url": "https://www.114.co.kr/search/detail?comp_id=977761&comp_tp_cd=INT&upjong_cd=892211"
+  },
+  {
+    "id": 125,
+    "name": "궁동종합사회복지관수영장",
+    "url": "http://www.happykd.or.kr/sub/sub03_03.php"
+  },
+  {
+    "id": 126,
+    "name": "혜원유치원",
+    "url": "https://www.studyholic.com/Eduinfo/KinderView.asp?idx=2236"
+  },
+  {
+    "id": 247,
+    "name": "강남 수영장",
+    "url": "https://example.com"
+  }
+]

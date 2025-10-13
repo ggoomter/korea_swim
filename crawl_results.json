@@ -1,0 +1,72 @@
+[
+  {
+    "url": "https://life.gangnam.go.kr/fmcs/63?action-value=dbb6e4d860c490948f61ebe14efbe8d5&action=read",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 1,
+    "pool_name": "강남구민체육센터 수영장"
+  },
+  {
+    "url": "https://www.gangnam.go.kr/center/contents/center_edu_3220049/1/view.do?mid=MC0602&office=3220049",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 2,
+    "pool_name": "대치1동 구민체육센터"
+  },
+  {
+    "url": "https://online.igangdong.or.kr/lecture/list.do",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 3,
+    "pool_name": "강동구민회관 수영장"
+  },
+  {
+    "url": "https://www.gangdong.go.kr/web/culture/contents/gdc035_050_018",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 4,
+    "pool_name": "천호체육관 수영장"
+  },
+  {
+    "url": "https://www.gangbuk.go.kr/portal/bbs/B0000142/view.do?nttId=128653&menuNo=200625",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 5,
+    "pool_name": "강북구민체육센터"
+  },
+  {
+    "url": "https://sports.seoul.go.kr/main/facilities/facilities_view.do?ft_idx=684",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 6,
+    "pool_name": "강서구민체육센터"
+  },
+  {
+    "url": "https://www.gwanakgongdan.or.kr/www/1399?action=read&action-value=e29032c52a37c276de84283f025cb798",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 7,
+    "pool_name": "관악구민체육센터"
+  },
+  {
+    "url": "https://booking.gwangjin.or.kr/fmcs/102?action=read&action-value=07440e52e2bec98d52dbc8618a103e04",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 8,
+    "pool_name": "광진구민체육센터"
+  },
+  {
+    "url": "https://www.gurosisul.or.kr/mod.asp?m=business&s=b01",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 9,
+    "pool_name": "구로구민체육센터"
+  },
+  {
+    "url": "https://www.gfmc.kr/page/business/sub05_030101.php",
+    "monthly_lesson_price": null,
+    "free_swim_price": null,
+    "pool_id": 10,
+    "pool_name": "금천구민체육센터"
+  }
+]
