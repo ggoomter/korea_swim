@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 from app.models.swimming_pool import SwimmingPool
 from app.schemas.swimming_pool import SwimmingPoolCreate
 from typing import List, Optional
@@ -8,8 +7,34 @@ import math
 def get_swimming_pool(db: Session, pool_id: int):
     return db.query(SwimmingPool).filter(SwimmingPool.id == pool_id).first()
 
-def get_swimming_pools(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(SwimmingPool).offset(skip).limit(limit).all()
+def get_swimming_pools(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    source: Optional[str] = None,
+    has_free_swim: Optional[bool] = None,
+    min_price: Optional[int] = None,
+    max_price: Optional[int] = None
+):
+    """Fetch swimming pools with optional filtering."""
+    query = db.query(SwimmingPool)
+
+    if source:
+        query = query.filter(SwimmingPool.source == source)
+
+    if has_free_swim is not None:
+        if has_free_swim:
+            query = query.filter(SwimmingPool.free_swim_times.isnot(None))
+        else:
+            query = query.filter(SwimmingPool.free_swim_times.is_(None))
+
+    if min_price is not None:
+        query = query.filter(SwimmingPool.daily_price >= min_price)
+
+    if max_price is not None:
+        query = query.filter(SwimmingPool.daily_price <= max_price)
+
+    return query.offset(skip).limit(limit).all()
 
 def create_swimming_pool(db: Session, pool: SwimmingPoolCreate):
     db_pool = SwimmingPool(**pool.dict())
@@ -60,7 +85,8 @@ def search_nearby_pools(
     radius_km: float = 5.0,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
-    has_free_swim: Optional[bool] = None
+    has_free_swim: Optional[bool] = None,
+    only_with_price: bool = False  # 기본적으로 모든 수영장 표시 (가격 추정 포함)
 ) -> List[SwimmingPool]:
     """
     위도/경도 기반 반경 검색 (Haversine formula)
@@ -75,13 +101,19 @@ def search_nearby_pools(
         SwimmingPool.is_active == True
     )
 
+    # only_with_price=True인 경우에만 가격이 없는 수영장 제외
+    if only_with_price:
+        query = query.filter(
+            SwimmingPool.daily_price.isnot(None)
+        )
+
     if min_price is not None:
         query = query.filter(SwimmingPool.daily_price >= min_price)
 
     if max_price is not None:
         query = query.filter(SwimmingPool.daily_price <= max_price)
 
-    if has_free_swim:
+    if has_free_swim is True:
         query = query.filter(SwimmingPool.free_swim_times.isnot(None))
 
     results = query.all()
