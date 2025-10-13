@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수영장 Excel 관리</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.3em;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 8px 0;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏊 수영장 Excel 관리</h1>
+        <p class="description">
+            수영장 정보를 Excel 파일(.xlsx)로 다운로드하고, 수정 후 업로드하여 대량 업데이트할 수 있습니다.
+            <br>한글이 완벽하게 지원됩니다!
+        </p>
+
+        <!-- 1. Excel 다운로드 섹션 -->
+        <div class="section">
+            <h2>1️⃣ Excel 다운로드</h2>
+            <div class="instructions">
+                <p><strong>사용 방법:</strong></p>
+                <ol>
+                    <li>아래 버튼을 클릭하여 현재 모든 수영장 정보를 Excel 파일로 다운로드</li>
+                    <li>Excel에서 파일 열기 (한글 완벽 지원)</li>
+                    <li>가격 정보 수정 (빈 칸에 실제 가격 입력)</li>
+                    <li>Excel 파일로 저장 (.xlsx 형식)</li>
+                </ol>
+            </div>
+            <button onclick="downloadExcel()">📥 Excel 다운로드</button>
+            <div id="downloadResult" class="result"></div>
+        </div>
+
+        <!-- 2. Excel 업로드 섹션 -->
+        <div class="section">
+            <h2>2️⃣ Excel 업로드 (일괄 업데이트)</h2>
+            <div class="instructions">
+                <p><strong>업데이트 가능한 항목:</strong></p>
+                <ul>
+                    <li>✅ <strong>주소</strong> - 잘못된 주소 수정 가능</li>
+                    <li>✅ <strong>전화번호</strong> - 전화번호 수정 가능</li>
+                    <li>✅ <strong>한달 수강권</strong> - 숫자만 입력 (원 단위 없이)</li>
+                    <li>✅ <strong>자유수영</strong> - 숫자만 입력 (원 단위 없이)</li>
+                    <li>✅ <strong>웹사이트</strong> - URL 수정 가능</li>
+                </ul>
+                <p><strong>주의사항:</strong></p>
+                <ul>
+                    <li><code>ID</code> 컬럼은 반드시 유지해야 합니다 (절대 수정 금지)</li>
+                    <li>비어있는 칸은 업데이트하지 않습니다</li>
+                    <li>.xlsx 형식으로 저장하세요</li>
+                </ul>
+            </div>
+            <input type="file" id="excelFile" accept=".xlsx" />
+            <button onclick="uploadExcel()">📤 Excel 업로드 및 업데이트</button>
+            <div id="uploadResult" class="result"></div>
+        </div>
+
+        <!-- API 엔드포인트 정보 -->
+        <div class="section" style="border-left-color: #2196F3;">
+            <h2>📡 API 엔드포인트</h2>
+            <p><strong>다운로드:</strong> <code>GET /api/excel/export</code></p>
+            <p><strong>업로드:</strong> <code>POST /api/excel/import</code></p>
+            <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
+                curl 명령어로도 사용 가능합니다:
+            </p>
+            <pre style="background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto;">
+# 다운로드
+curl http://localhost:8000/api/excel/export -o pools.xlsx
+
+# 업로드
+curl -X POST http://localhost:8000/api/excel/import -F "file=@pools.xlsx"
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        async function downloadExcel() {
+            const resultDiv = document.getElementById('downloadResult');
+            resultDiv.className = 'result';
+            resultDiv.textContent = '다운로드 중...';
+            resultDiv.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/excel/export`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'swimming_pools.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                resultDiv.className = 'result success';
+                resultDiv.textContent = '✅ Excel 파일 다운로드 완료! (한글 완벽 지원)';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ 오류: ${error.message}`;
+            }
+        }
+
+        async function uploadExcel() {
+            const fileInput = document.getElementById('excelFile');
+            const resultDiv = document.getElementById('uploadResult');
+
+            if (!fileInput.files.length) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ Excel 파일을 선택하세요';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            const file = fileInput.files[0];
+
+            if (!file.name.endsWith('.xlsx')) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ Excel 파일(.xlsx)만 업로드 가능합니다';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            resultDiv.className = 'result';
+            resultDiv.textContent = '업로드 중...';
+            resultDiv.style.display = 'block';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/excel/import`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || '업로드 실패');
+                }
+
+                let message = `✅ 업데이트 완료!\n\n`;
+                message += `• 전체 행: ${data.total_rows}개\n`;
+                message += `• 업데이트: ${data.updated_count}개\n`;
+
+                if (data.errors && data.errors.length > 0) {
+                    message += `\n⚠️ 오류 발생 (${data.errors.length}개):\n`;
+                    data.errors.slice(0, 5).forEach(err => {
+                        message += `  - ${err.row}번 행: ${err.error}\n`;
+                    });
+                    if (data.errors.length > 5) {
+                        message += `  ... 외 ${data.errors.length - 5}개\n`;
+                    }
+                }
+
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = message.replace(/\n/g, '<br>');
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ 오류: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

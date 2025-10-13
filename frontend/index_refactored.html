@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=4">
 </head>
 <body>
     <!-- Header -->
@@ -72,7 +72,8 @@
                             <option value="20">20km</option>
                         </select>
                     </div>
-                    <button class="btn-secondary" id="search-seoul">📍 서울 중심에서 검색</button>
+                    <button class="btn-secondary" id="search-current">📍 내 위치에서 검색</button>
+                    <button class="btn-secondary" id="search-seoul">🏙️ 서울 중심 검색</button>
                     <button class="btn-subway" id="toggle-subway">🚇 지하철 노선도</button>
                 </div>
             </div>
@@ -93,6 +94,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Application JS -->
-    <script src="js/app.js"></script>
+    <script src="js/popupUtils.js?v=1"></script>
+    <script src="js/app.js?v=12"></script>
 </body>
 </html>

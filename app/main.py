@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from app.api import pools
+from app.api import pools, csv_operations
 from database.connection import init_db
 import os
 
@@ -43,6 +43,7 @@ if os.path.exists(frontend_path):
 
 # 라우터 등록 - 정적 파일 이후에 등록
 app.include_router(pools.router, prefix="/api")
+app.include_router(csv_operations.router, prefix="/api")
 
 @app.on_event("startup")
 def startup_event():

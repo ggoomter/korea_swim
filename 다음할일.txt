@@ -1,0 +1,10 @@
+  다음 할 일 메모
+
+  - 브라우저 콘솔에서 swimDebug.print()로 현재 focusAnchor와 cardScrollBias 확인.
+  - 원하는 위치를 찾을 때까지 swimDebug.setFocusAnchorY(…)와 swimDebug.setCardScrollBias(…) 값을 여러 번 테스트.
+  - 만족스러운 조합을 찾으면 그 값을 frontend/data/config.json의 focusAnchor.y 및 cardScrollBias에 반영.
+  - 필요하면 swimDebug.recenter()로 현재 선택된 카드/마커를 즉시 재배치해 결과 확인.
+  - 모든 게 마음에 들면 Shift+새로고침해서 캐시를 리셋하고 최종 동작 확인.
+
+  저는 여기서 콘솔을 직접 조작해둘 방법은 없지만, 위 스텝대로 진행하시면 나중에 돌아오셔서 바로 조절을 이어가실 수 있습
+  니다. 필요하면 언제든지 불러주세요!

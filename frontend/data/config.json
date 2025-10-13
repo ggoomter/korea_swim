@@ -15,7 +15,13 @@
     "defaultZoom": 12,
     "searchRadius": 5,
     "tileLayer": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    "attribution": "&copy; OpenStreetMap contributors"
+    "attribution": "&copy; OpenStreetMap contributors",
+    "focusAnchor": {
+      "x": 0.6,
+      "y": 0.8
+    },
+    "popupMargin": 80,
+    "cardScrollBias": -0.15
   },
   "search": {
     "nominatimUrl": "https://nominatim.openstreetmap.org/search",

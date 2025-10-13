@@ -17,7 +17,12 @@
       "WebSearch",
       "WebFetch(domain:data.seoul.go.kr)",
       "Read(//g/**)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(start:*)",
+      "Bash(del \"\\?\\G:\\ai_coding\\korea_swim\\nul\")",
+      "Bash(cmd /c del:*)"
     ],
     "deny": [],
     "ask": []

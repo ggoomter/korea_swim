@@ -10,6 +10,7 @@ import requests
 import json
 
 BASE_URL = "http://localhost:8000"
+API_PREFIX = "/api"
 
 def search_nearby_pools(lat, lng, radius_km=5.0, location_name=""):
     """
@@ -29,7 +30,7 @@ def search_nearby_pools(lat, lng, radius_km=5.0, location_name=""):
     }
 
     try:
-        response = requests.post(f"{BASE_URL}/pools/search", json=search_data)
+        response = requests.post(f"{BASE_URL}{API_PREFIX}/pools/search", json=search_data)
         response.raise_for_status()
         results = response.json()
 
