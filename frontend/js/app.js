@@ -25,6 +25,16 @@ class SwimSeoulApp {
         return /(공공|서울시|행정)/i.test(source);
     }
 
+    formatPrice(price) {
+        if (!price) return '문의';
+        // 숫자로만 이루어진 경우 천단위 콤마 추가
+        if (/^\d+$/.test(String(price))) {
+            return parseInt(price).toLocaleString() + '원';
+        }
+        // 그 외는 그대로 표시 (예: "가격 다양, 표 참조")
+        return price;
+    }
+
     async init() {
         try {
             // Load configuration and data
@@ -247,8 +257,8 @@ class SwimSeoulApp {
                 ${pool.image_url ? `<img src="${pool.image_url}" alt="${pool.name}" class="pool-popup-image">` : ''}
                 <p><strong>📍</strong> ${pool.address}</p>
                 <p><strong>☎️</strong> ${pool.phone || '정보 없음'}</p>
-                <p><strong>💰 한달 수강권:</strong> ${pool.monthly_lesson_price?.toLocaleString() || '문의'}원</p>
-                <p><strong>🏊 자유수영:</strong> ${pool.free_swim_price?.toLocaleString() || '문의'}원</p>
+                <p><strong>💰 한달 수강권:</strong> ${this.formatPrice(pool.monthly_lesson_price)}</p>
+                <p><strong>🏊 자유수영:</strong> ${this.formatPrice(pool.free_swim_price)}</p>
                 ${pool.rating ? `<p><strong>⭐ 평점:</strong> ${pool.rating}/5.0</p>` : ''}
                 ${pool.description ? `<p class="description">${pool.description}</p>` : ''}
             </div>
@@ -271,11 +281,11 @@ class SwimSeoulApp {
                 <div class="pool-prices">
                     <div class="price-item">
                         <span class="price-label">한달 수강권</span>
-                        <span class="price-value">${pool.monthly_lesson_price?.toLocaleString() || '문의'}원</span>
+                        <span class="price-value">${this.formatPrice(pool.monthly_lesson_price)}</span>
                     </div>
                     <div class="price-item">
                         <span class="price-label">자유수영</span>
-                        <span class="price-value">${pool.free_swim_price?.toLocaleString() || '문의'}원</span>
+                        <span class="price-value">${this.formatPrice(pool.free_swim_price)}</span>
                     </div>
                 </div>
                 ${pool.facilities && pool.facilities.length > 0 ? `

@@ -89,8 +89,8 @@ async def import_pools_from_excel(
     업데이트 가능한 필드:
     - 주소 (address)
     - 전화번호 (phone)
-    - 한달 수강권 (monthly_lesson_price) - 1개월 강습 가격
-    - 자유수영 (free_swim_price) - 자유수영 1회 가격
+    - 한달 수강권 (monthly_lesson_price) - 숫자 또는 문자열 (예: "150000" 또는 "가격 다양, 표 참조")
+    - 자유수영 (free_swim_price) - 숫자 또는 문자열 (예: "8000" 또는 "시간대별 상이")
     - 웹사이트 (url)
 
     주의:
@@ -145,35 +145,19 @@ async def import_pools_from_excel(
                 # 업데이트할 필드 체크
                 updated = False
 
-                # 한달 수강권 가격
+                # 한달 수강권 가격 (문자열로 저장)
                 if '한달 수강권' in row_dict and row_dict['한달 수강권']:
-                    try:
-                        monthly_lesson_price = int(row_dict['한달 수강권'])
-                        pool.monthly_lesson_price = monthly_lesson_price
+                    value = str(row_dict['한달 수강권']).strip()
+                    if value:
+                        pool.monthly_lesson_price = value
                         updated = True
-                    except (ValueError, TypeError):
-                        error_rows.append({
-                            "row": row_num,
-                            "id": pool_id,
-                            "name": pool.name,
-                            "error": f"한달 수강권 가격 형식 오류: {row_dict['한달 수강권']}"
-                        })
-                        continue
 
-                # 자유수영 가격
+                # 자유수영 가격 (문자열로 저장)
                 if '자유수영' in row_dict and row_dict['자유수영']:
-                    try:
-                        free_swim_price = int(row_dict['자유수영'])
-                        pool.free_swim_price = free_swim_price
+                    value = str(row_dict['자유수영']).strip()
+                    if value:
+                        pool.free_swim_price = value
                         updated = True
-                    except (ValueError, TypeError):
-                        error_rows.append({
-                            "row": row_num,
-                            "id": pool_id,
-                            "name": pool.name,
-                            "error": f"자유수영 가격 형식 오류: {row_dict['자유수영']}"
-                        })
-                        continue
 
                 # 주소
                 if '주소' in row_dict and row_dict['주소']:

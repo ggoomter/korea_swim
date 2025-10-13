@@ -25,11 +25,11 @@ class SwimmingPool(Base):
 
     # 가격 정보
     membership_prices = Column(JSON, nullable=True)  # {"1month": 100000, "3month": 270000, ...}
-    monthly_lesson_price = Column(Integer, nullable=True)  # 한달 수강권 (1개월 강습)
+    monthly_lesson_price = Column(String, nullable=True)  # 한달 수강권 (예: "150000" 또는 "가격 다양, 표 참조")
 
     # 자율수영 정보
     free_swim_times = Column(JSON, nullable=True)  # {"mon": ["06:00-08:00", "20:00-22:00"], ...}
-    free_swim_price = Column(Integer, nullable=True)  # 자유수영 1회 가격
+    free_swim_price = Column(String, nullable=True)  # 자유수영 1회 가격 (예: "8000" 또는 "시간대별 상이")
 
     # 레슨 정보
     lessons = Column(JSON, nullable=True)  # [{"type": "초급", "price": 200000, "schedule": "월수금"}]
