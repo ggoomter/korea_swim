@@ -84,7 +84,12 @@
       "WebFetch(domain:www.ddmy.or.kr)",
       "WebFetch(domain:swimmingis.com)",
       "WebFetch(domain:learns.academy)",
-      "WebFetch(domain:www.da-gym.co.kr)"
+      "WebFetch(domain:www.da-gym.co.kr)",
+      "Bash(del run_debug.bat run_fixed.bat start_server.bat)",
+      "Bash(cmd /c \"del run_debug.bat run_fixed.bat start_server.bat\")",
+      "Bash(if exist run_debug.bat del run_debug.bat)",
+      "Bash(if exist run_fixed.bat del run_fixed.bat)",
+      "Bash(if exist start_server.bat del start_server.bat)"
     ],
     "deny": [],
     "ask": []

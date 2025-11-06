@@ -1,17 +1,25 @@
 @echo off
-echo ========================================
+chcp 65001 >nul 2>&1
+setlocal
+
+cls
 echo 한국 수영장 정보 API 서버 시작
-echo ========================================
 echo.
 
-REM 가상환경 활성화 (있는 경우)
-if exist venv\Scripts\activate.bat (
-    call venv\Scripts\activate.bat
+python -c "import fastapi" >nul 2>&1
+if errorlevel 1 (
+    echo 필수 패키지 설치 중...
+    pip install -r requirements.txt >nul 2>&1
+    echo 설치 완료!
+    echo.
 )
 
-REM 서버 실행
-echo 서버 시작 중...
 echo API 문서: http://localhost:8000/docs
+echo 웹페이지: frontend\index_refactored.html
+echo.
+echo 서버 실행 중... (종료: Ctrl+C)
 echo.
 
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+
+pause >nul
