@@ -34,13 +34,15 @@ body {
 
 /* Header */
 .header {
-    background: var(--surface);
-    padding: 20px 32px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 16px 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1px 3px var(--shadow);
-    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     position: relative;
     z-index: 1000;
 }
@@ -48,71 +50,51 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
 .logo-icon {
     width: 44px;
     height: 44px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    border-radius: 12px;
+    background: linear-gradient(135deg, #0EA5E9, #2563EB);
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
 }
 
 .logo-text h1 {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.5px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.8px;
+    background: linear-gradient(to right, #0F172A, #334155);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .logo-text p {
-    font-size: 13px;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.header-stats {
-    display: flex;
-    gap: 20px;
-}
-
-.stat-item {
-    text-align: center;
-    background: var(--background);
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-}
-
-.stat-number {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--primary);
-    display: block;
-}
-
-.stat-label {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
-    display: block;
-    margin-top: 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* Main Container */
 .container {
     display: flex;
-    height: calc(100vh - 86px);
+    height: calc(100vh - 77px);
     overflow: hidden;
 }
 
 /* Sidebar */
 .sidebar {
     width: 450px;
-    background: var(--background);
+    background: #F1F5F9;
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -120,11 +102,11 @@ body {
 }
 
 .search-section {
-    padding: 20px;
-    background: linear-gradient(to bottom, #ffffff, #f8fafc);
+    padding: 24px;
+    background: white;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     position: relative;
     z-index: 1;
 }
@@ -136,11 +118,11 @@ body {
 
 .search-icon {
     position: absolute;
-    left: 14px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 18px;
-    color: var(--text-muted);
+    color: var(--primary);
     z-index: 1;
 }
 
@@ -647,4 +629,314 @@ body {
     .header-stats {
         display: none;
     }
+}
+
+/* Status Colors & Badges */
+.status-open {
+    color: var(--success);
+}
+
+.status-closed {
+    color: var(--danger);
+}
+
+.status-closing-soon {
+    color: var(--accent);
+}
+
+.status-unknown {
+    color: var(--text-muted);
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-badge.status-open {
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.status-badge.status-closed {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.status-badge.status-closing-soon {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 4px;
+}
+
+.status-dot.status-open {
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+}
+
+.status-dot.status-closed {
+    background: var(--danger);
+}
+
+.status-dot.status-closing-soon {
+    background: var(--accent);
+}
+
+.pool-card-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.pool-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+}
+
+.status-text {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Action Buttons */
+.card-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.action-btn-mini {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.action-btn-mini:hover {
+    transform: scale(1.1);
+    border-color: var(--primary);
+}
+
+.action-btn-mini.naver {
+    color: #03C75A;
+}
+
+.action-btn-mini.kakao {
+    color: #FEE500;
+    background: #3C1E1E;
+    border: none;
+}
+
+.action-btn-mini.google {
+    color: #4285F4;
+}
+
+/* Popup Enhancements */
+.pool-popup {
+    padding: 10px 5px;
+}
+
+.popup-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.popup-info-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+.popup-icon {
+    font-size: 16px;
+}
+
+.popup-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.popup-price-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: var(--background);
+    padding: 12px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+.popup-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.nav-btn {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.nav-btn:hover {
+    opacity: 0.9;
+}
+
+.nav-btn.naver {
+    background: #03C75A;
+    color: white;
+}
+
+.nav-btn.kakao {
+    background: #FEE500;
+    color: #3C1E1E;
+}
+
+/* Facility Icons & Badges */
+.facility-icons {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.facility-icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.facility-icon-circle {
+    width: 32px;
+    height: 32px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.facility-icon-item:hover .facility-icon-circle {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    background: white;
+}
+
+.facility-icon-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* Free Swim Timetable */
+.timetable-container {
+    margin-top: 15px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.timetable-header {
+    background: var(--background);
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.timetable-grid {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    background: #fff;
+}
+
+.day-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+
+.day-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.time-pill-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+}
+
+.time-pill {
+    font-size: 8px;
+    background: rgba(14, 165, 233, 0.08);
+    color: var(--primary);
+    padding: 2px 0;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.day-slot.today {
+    background: rgba(14, 165, 233, 0.03);
+    border-radius: 6px;
+    padding: 2px 0;
+}
+
+.day-slot.today .day-label {
+    color: var(--primary);
+}
+
+.day-slot.today .time-pill {
+    background: var(--primary);
+    color: white;
+}
+
+/* Premium Divider */
+.premium-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 15px 0;
 }
