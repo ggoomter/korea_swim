@@ -109,30 +109,9 @@ class RealDataCrawler:
             {"name": "중랑구민체육센터", "address": "서울 중랑구 신내역로3길 82", "lat": 37.6026, "lng": 127.0925, "phone": "02-2094-1709", "gu": "중랑구"},
         ]
 
-        # 기본 정보 추가
+        # 기본 정보 추가 (가격 및 시간은 빈 상태로)
         for pool in seoul_pools:
             pool.update({
-                "operating_hours": {"mon-fri": "06:00-22:00", "sat-sun": "08:00-20:00"},
-                "facilities": ["락커룸", "샤워실", "주차장"],
-                "daily_price": 5000,
-                "free_swim_price": 4000,
-                "free_swim_times": {
-                    "mon": ["06:00-08:00", "20:00-22:00"],
-                    "tue": ["06:00-08:00", "20:00-22:00"],
-                    "wed": ["06:00-08:00", "20:00-22:00"],
-                    "thu": ["06:00-08:00", "20:00-22:00"],
-                    "fri": ["06:00-08:00", "20:00-22:00"],
-                    "sat": ["08:00-12:00"],
-                    "sun": ["08:00-12:00"]
-                },
-                "membership_prices": {
-                    "1month": 120000,
-                    "3month": 330000,
-                    "6month": 600000
-                },
-                "lanes": 6,
-                "pool_size": "25m x 15m",
-                "water_temp": "28도",
                 "source": "서울시공공데이터",
                 "rating": 4.2
             })
@@ -165,10 +144,6 @@ class RealDataCrawler:
 
         for pool in cities:
             pool.update({
-                "operating_hours": {"mon-fri": "06:00-22:00", "sat-sun": "08:00-20:00"},
-                "facilities": ["락커룸", "샤워실", "주차장", "사우나"],
-                "daily_price": 4500,
-                "free_swim_price": 3500,
                 "source": "공공데이터",
                 "rating": 4.0
             })

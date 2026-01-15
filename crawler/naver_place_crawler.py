@@ -113,26 +113,6 @@ class NaverPlaceCrawler:
             "어린이": 2000,
         }
 
-    def estimate_price_by_category(self, pool_name: str, category: str) -> Optional[int]:
-        """카테고리와 이름으로 가격 추정"""
-        # 공공 수영장 가격
-        public_keywords = self.get_public_pool_prices()
-        for keyword, price in public_keywords.items():
-            if keyword in pool_name:
-                return price
-
-        # 민간 수영장 카테고리별 가격
-        if "호텔" in category or "호텔" in pool_name:
-            return 20000
-        elif "피트니스" in category or "헬스" in pool_name or "스포츠센터" in pool_name:
-            return 12000
-        elif "수영장" in category:
-            return 10000
-        elif "아카데미" in pool_name or "강습" in pool_name:
-            return 8000
-
-        return None
-
     def crawl_pool_info(self, pool_name: str, address: str) -> Dict:
         """수영장 정보 크롤링"""
         result = {
@@ -151,12 +131,6 @@ class NaverPlaceCrawler:
 
         if not place_info:
             print(f"  ✗ 네이버 플레이스 없음")
-            # 카테고리 기반 가격 추정
-            estimated_price = self.estimate_price_by_category(pool_name, "")
-            if estimated_price:
-                result["daily_price"] = estimated_price
-                result["free_swim_price"] = estimated_price
-                print(f"  ⚠️  가격 추정: {estimated_price:,}원")
             return result
 
         # 2. 전화번호, 카테고리 저장
@@ -166,18 +140,10 @@ class NaverPlaceCrawler:
         print(f"  ✓ 플레이스 발견: {place_info['title']}")
         print(f"    카테고리: {result['category']}")
 
-        # 3. 가격 추정
-        estimated_price = self.estimate_price_by_category(pool_name, result['category'])
-
-        if estimated_price:
-            result["daily_price"] = estimated_price
-            result["free_swim_price"] = estimated_price
-            print(f"  ✓ 가격 추정: {estimated_price:,}원")
-        else:
-            result["daily_price"] = 10000
-            result["free_swim_price"] = 8000
-            print(f"  ⚠️  기본 가격 설정: 10,000원/8,000원")
-
+        # 네이버 지역 검색 API는 기본적으로 가격 정보를 제공하지 않으므로
+        # 여기서는 기본 정보를 채우는 용도로만 사용하고, 
+        # 실제 가격은 별도의 웹 크롤러(price_crawler.py)에서 가져오도록 유도합니다.
+        
         return result
 
     def update_database(self):

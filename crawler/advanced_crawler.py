@@ -259,10 +259,6 @@ class AdvancedPoolCrawler:
                     title = item.get("title", "").replace("<b>", "").replace("</b>", "")
                     address = item.get("address", "") or item.get("roadAddress", "")
 
-                    # 서울만 필터링
-                    if "서울" not in address:
-                        continue
-
                     # 좌표 변환 (카텍좌표 -> 위경도)
                     mapx = int(item.get("mapx", 0)) / 10000000
                     mapy = int(item.get("mapy", 0)) / 10000000
@@ -331,6 +327,15 @@ class AdvancedPoolCrawler:
             "서울 수영 아카데미",
         ]
 
+        # 주요 광역시 추가
+        major_cities = [
+            "부산", "인천", "대구", "대전", "광주", "울산", "세종", "경기도", "제주"
+        ]
+        
+        for city in major_cities:
+            search_keywords.append(f"{city} 수영장")
+            search_keywords.append(f"{city} 실내수영장")
+
         # 서울 25개 구별 검색
         seoul_districts = [
             "강남구", "강동구", "강북구", "강서구", "관악구",
@@ -354,40 +359,29 @@ class AdvancedPoolCrawler:
         return self.collected_pools
 
     def enrich_pool_data(self, pool: Dict) -> Dict:
-        """수영장 정보 보강 (이미지, 기본값 추가)"""
+        """수영장 정보 보강 (이미지)"""
         # 이미지 크롤링
         image_url = self.get_image_from_naver_api(pool["name"])
         if image_url:
             pool["image_url"] = image_url
 
-        # 기본값 설정
+        # 가격 및 시간 정보는 기본값을 넣지 않고 빈 상태로 둡니다.
+        # 실제 데이터는 price_crawler.py 등을 통해 채워지게 됩니다.
+        
+        # 기본 필드 초기화 (None으로 설정)
         if "daily_price" not in pool:
-            pool["daily_price"] = 10000
+            pool["daily_price"] = None
         if "free_swim_price" not in pool:
-            pool["free_swim_price"] = 8000
+            pool["free_swim_price"] = None
+        if "operating_hours" not in pool:
+            pool["operating_hours"] = None
+        if "free_swim_times" not in pool:
+            pool["free_swim_times"] = None
 
-        pool["operating_hours"] = {
-            "mon-fri": "06:00-22:00",
-            "sat": "07:00-21:00",
-            "sun": "08:00-20:00"
-        }
-
-        pool["free_swim_times"] = {
-            "mon": ["06:00-08:00", "13:00-15:00", "20:00-22:00"],
-            "tue": ["06:00-08:00", "13:00-15:00", "20:00-22:00"],
-            "wed": ["06:00-08:00", "13:00-15:00", "20:00-22:00"],
-            "thu": ["06:00-08:00", "13:00-15:00", "20:00-22:00"],
-            "fri": ["06:00-08:00", "13:00-15:00", "20:00-22:00"],
-            "sat": ["07:00-09:00", "14:00-16:00"],
-            "sun": ["08:00-10:00", "14:00-16:00"]
-        }
-
-        pool["facilities"] = ["수영장", "락커룸", "샤워실"]
-        pool["lanes"] = 6
-        pool["pool_size"] = "25m x 12m"
-        pool["water_temp"] = "28도"
-        pool["rating"] = 4.0
-
+        # 기타 부가 정보 (기본값 최소화)
+        if "facilities" not in pool:
+            pool["facilities"] = ["수영장"]
+        
         return pool
 
     def crawl_all_pools(self) -> List[Dict]:

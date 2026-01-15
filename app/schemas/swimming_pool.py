@@ -14,6 +14,7 @@ class SwimmingPoolBase(BaseModel):
     water_temp: Optional[str] = None
     facilities: Optional[List[str]] = None
     membership_prices: Optional[Dict] = None
+    daily_price: Optional[str] = None  # 일일권 가격 (예: "10000")
     monthly_lesson_price: Optional[str] = None  # 한달 수강권 (예: "150000" 또는 "가격 다양, 표 참조")
     free_swim_times: Optional[Dict] = None
     free_swim_price: Optional[str] = None  # 자유수영 (예: "8000" 또는 "시간대별 상이")

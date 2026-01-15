@@ -81,22 +81,37 @@ class PoolPriceCrawler:
             print(f"✗ 웹사이트 찾기 실패 ({pool_name}): {str(e)[:50]}")
             return None
 
-    def extract_price_from_text(self, text: str) -> Optional[int]:
+    def extract_price_from_text(self, text: str, context: str = "") -> Optional[int]:
         """텍스트에서 가격 추출 (원 단위)"""
-        # 가격 패턴: 10,000원, 10000원, 1만원 등
+        # 가격 패턴: 10,000원, 10,000, 10000원, 1만원 등
         patterns = [
-            r'(\d{1,3}(?:,\d{3})*)\s*원',  # 10,000원
+            r'(\d{1,3}(?:,\d{3})*)\s*원',  # 10,000원 or 10000원
             r'(\d+)\s*만\s*원',             # 1만원
-            r'(\d+)원',                      # 10000원
+            r'(\d+)\s*만\s*(\d{1,4})\s*원',  # 1만 5000원
+            r'(\d{4,6})\s*원',              # 10000원
         ]
 
+        # "성인", "대인", "일반" 키워드가 포함된 경우 우선순위
+        is_adult = any(kw in context for kw in ['성인', '대인', '일반', 'adult'])
+        
         for pattern in patterns:
-            match = re.search(pattern, text)
-            if match:
-                price_str = match.group(1).replace(',', '')
-                if '만' in text[match.start():match.end()+2]:
-                    return int(price_str) * 10000
-                return int(price_str)
+            matches = re.finditer(pattern, text)
+            for match in matches:
+                try:
+                    price_str = match.group(1).replace(',', '')
+                    
+                    if '만' in match.group(0):
+                        price = int(price_str) * 10000
+                        if len(match.groups()) > 1 and match.group(2):
+                            price += int(match.group(2))
+                    else:
+                        price = int(price_str)
+                    
+                    # 수영장 1일권/자유수영 가격으로 적절한지 체크 (2,000원 ~ 50,000원)
+                    if 2000 <= price <= 50000:
+                        return price
+                except (ValueError, IndexError):
+                    continue
 
         return None
 
@@ -126,8 +141,8 @@ class PoolPriceCrawler:
     def crawl_pool_website(self, url: str, pool_name: str) -> Dict:
         """수영장 웹사이트에서 가격 및 시간 정보 크롤링"""
         result = {
-            "daily_price": None,
             "free_swim_price": None,
+            "monthly_lesson_price": None,
             "free_swim_times": [],
             "operating_hours": None
         }
@@ -143,9 +158,8 @@ class PoolPriceCrawler:
             text = soup.get_text(separator=' ', strip=True)
 
             # 가격 정보 추출
-            # "자유수영" 관련 섹션 찾기
             free_swim_keywords = ['자유수영', '자율수영', '일일입장', '1회 이용']
-            lesson_keywords = ['강습', '수강', '회원']
+            lesson_keywords = ['강습', '수강', '월 수영', '한달']
 
             # 텍스트를 줄 단위로 분리
             lines = [line.strip() for line in text.split('\n') if line.strip()]
@@ -155,12 +169,19 @@ class PoolPriceCrawler:
 
                 # 자유수영 가격 찾기
                 if any(keyword in line for keyword in free_swim_keywords):
-                    # 현재 줄과 다음 3줄에서 가격 찾기
                     for j in range(i, min(i+4, len(lines))):
-                        price = self.extract_price_from_text(lines[j])
-                        if price and 3000 <= price <= 30000:  # 합리적인 가격 범위
-                            if result["free_swim_price"] is None:
-                                result["free_swim_price"] = price
+                        price = self.extract_price_from_text(lines[j], context=line)
+                        if price and result["free_swim_price"] is None:
+                            result["free_swim_price"] = price
+                            break
+
+                # 한달 수강권 가격 찾기
+                if any(keyword in line for keyword in lesson_keywords):
+                    for j in range(i, min(i+4, len(lines))):
+                        price = self.extract_price_from_text(lines[j], context=line)
+                        if price and price > 30000: # 강습은 보통 3만원 이상
+                            if result["monthly_lesson_price"] is None:
+                                result["monthly_lesson_price"] = price
                             break
 
                 # 자유수영 시간 찾기
@@ -189,12 +210,14 @@ class PoolPriceCrawler:
         conn = sqlite3.connect('swimming_pools.db')
         cursor = conn.cursor()
 
-        # URL이 없거나 가격이 기본값인 수영장 가져오기
+        # URL이 없거나 가격이 비어있는 수영장 가져오기
         cursor.execute('''
             SELECT id, name, address, url
             FROM swimming_pools
-            WHERE (url IS NULL OR url = '')
-               OR (daily_price = 10000 OR daily_price = 5000)
+            WHERE (url IS NULL OR url = '' OR url = '정보 없음')
+               OR (free_swim_price IS NULL OR free_swim_price = '')
+               OR (daily_price IS NULL OR daily_price = '')
+               OR (monthly_lesson_price IS NULL OR monthly_lesson_price = '')
             ORDER BY id
         ''')
 
@@ -210,7 +233,7 @@ class PoolPriceCrawler:
             print(f"[{i+1}/{total}] {name}")
 
             # 1단계: 웹사이트 찾기
-            if not url or url == '':
+            if not url or url == '' or url == '정보 없음':
                 print(f"  → 웹사이트 검색 중...")
                 url = self.find_pool_website(name, address)
 
@@ -231,15 +254,17 @@ class PoolPriceCrawler:
             updates = []
             params = []
 
-            if price_data["daily_price"]:
-                updates.append("daily_price = ?")
-                params.append(price_data["daily_price"])
-                print(f"  ✓ 일일권: {price_data['daily_price']:,}원")
-
             if price_data["free_swim_price"]:
+                updates.append("daily_price = ?")
                 updates.append("free_swim_price = ?")
-                params.append(price_data["free_swim_price"])
-                print(f"  ✓ 자유수영: {price_data['free_swim_price']:,}원")
+                params.append(str(price_data["free_swim_price"]))
+                params.append(str(price_data["free_swim_price"]))
+                print(f"  ✓ 일일/자유수영: {price_data['free_swim_price']:,}원")
+
+            if price_data["monthly_lesson_price"]:
+                updates.append("monthly_lesson_price = ?")
+                params.append(str(price_data["monthly_lesson_price"]))
+                print(f"  ✓ 한달강습: {price_data['monthly_lesson_price']:,}원")
 
             if price_data["free_swim_times"]:
                 updates.append("free_swim_times = ?")

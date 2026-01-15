@@ -90,8 +90,7 @@ class SeoulPoolDataCrawler:
 
         # "유료 3,500원" 같은 패턴
         patterns = [
-            r'(\d{1,3}(?:,\d{3})+)\s*원',  # 3,500원
-            r'(\d+)\s*원',                  # 3500원
+            r'(\d{1,3}(?:,\d{3})*)\s*원',  # 3,500원 or 3500원
             r'(\d+)\s*만\s*원',             # 1만원
         ]
 
@@ -147,9 +146,8 @@ class SeoulPoolDataCrawler:
                 params.append(phone)
 
             if price and 1000 <= price <= 30000:
-                updates.append("daily_price = ?")
                 updates.append("free_swim_price = ?")
-                params.extend([price, price])
+                params.append(str(price))
                 print(f"✓ {db_name}: {price:,}원")
             else:
                 print(f"⚠️  {db_name}: 가격 정보 없음 ({pay_info[:30]}...)")
