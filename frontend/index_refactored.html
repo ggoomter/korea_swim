@@ -17,6 +17,14 @@
     <link rel="stylesheet" href="css/styles.css?v=4">
 </head>
 <body>
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p>서울시 수영장 정보를 불러오는 중입니다...</p>
+        </div>
+    </div>
+
     <!-- Header -->
     <div class="header">
         <div class="logo">
@@ -93,8 +101,14 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <!-- Mobile Toggle Button -->
+    <button id="mobile-toggle" class="mobile-toggle-btn">
+        <span class="icon">🗺️</span>
+        <span class="text">지도 보기</span>
+    </button>
+
     <!-- Application JS -->
     <script src="js/popupUtils.js?v=1"></script>
-    <script src="js/app.js?v=12"></script>
+    <script src="js/app.js?v=13"></script>
 </body>
 </html>

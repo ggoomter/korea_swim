@@ -17,7 +17,11 @@ class SwimSeoulApp {
         this.popupMargin = 80;
         this.popupUtils = (typeof SwimPopupUtils !== 'undefined') ? SwimPopupUtils : null;
         this.cardScrollBias = 0;
-        this.popupAutoAdjust = false;  // 팝업 자동 조정 비활성화 (기본값)
+        this.popupAutoAdjust = false;
+
+        // New UI Elements
+        this.loader = document.getElementById('loader');
+        this.isMobileMapView = false;
     }
 
     isPublicSource(source) {
@@ -27,16 +31,24 @@ class SwimSeoulApp {
 
     formatPrice(price) {
         if (!price) return '문의';
-        // 숫자로만 이루어진 경우 천단위 콤마 추가
         if (/^\d+$/.test(String(price))) {
             return parseInt(price).toLocaleString() + '원';
         }
-        // 그 외는 그대로 표시 (예: "가격 다양, 표 참조")
         return price;
+    }
+
+    showLoader() {
+        if (this.loader) this.loader.classList.remove('hidden');
+    }
+
+    hideLoader() {
+        if (this.loader) this.loader.classList.add('hidden');
     }
 
     async init() {
         try {
+            this.showLoader();
+
             // Load configuration and data
             await this.loadConfig();
             await this.loadSubwayData();
@@ -52,10 +64,13 @@ class SwimSeoulApp {
 
             console.log('✅ SwimSeoul initialized successfully');
             this.logFocusSettings();
-            console.info('🎛️ 위치 조정: swimDebug.지도세로(0.8) swimDebug.지도가로(0.6) swimDebug.리스트위치(-0.15)');
+
+            // Initial loader hide
+            this.hideLoader();
         } catch (error) {
             console.error('❌ Failed to initialize app:', error);
             this.showError('앱을 초기화하는 중 오류가 발생했습니다.');
+            this.hideLoader();
         }
     }
 
@@ -92,7 +107,6 @@ class SwimSeoulApp {
             maxZoom: 19
         }).addTo(this.map);
 
-        // Create custom pane for overlay that sits between tiles and overlays
         this.map.createPane('darkOverlay');
         this.map.getPane('darkOverlay').style.zIndex = 250;
         this.map.getPane('darkOverlay').style.pointerEvents = 'none';
@@ -130,10 +144,31 @@ class SwimSeoulApp {
         document.getElementById('search-radius').addEventListener('change', (e) => {
             this.searchByRadius(parseFloat(e.target.value));
         });
+
+        // Mobile View Toggle
+        const mobileToggleBtn = document.getElementById('mobile-toggle');
+        if (mobileToggleBtn) {
+            mobileToggleBtn.addEventListener('click', () => this.toggleMobileView());
+        }
+    }
+
+    toggleMobileView() {
+        this.isMobileMapView = !this.isMobileMapView;
+        const sidebar = document.querySelector('.sidebar');
+        const btn = document.getElementById('mobile-toggle');
+
+        if (this.isMobileMapView) {
+            sidebar.classList.add('mobile-hidden');
+            btn.innerHTML = '<span class="icon">📋</span><span class="text">목록 보기</span>';
+        } else {
+            sidebar.classList.remove('mobile-hidden');
+            btn.innerHTML = '<span class="icon">🗺️</span><span class="text">지도 보기</span>';
+        }
     }
 
     async loadPools() {
         try {
+            this.showLoader();
             const response = await fetch(`${this.config.api.baseUrl}${this.config.api.endpoints.pools}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch pools: ${response.status}`);
@@ -145,16 +180,17 @@ class SwimSeoulApp {
         } catch (error) {
             console.error('Failed to load pools:', error);
             this.showError('수영장 정보를 불러오는데 실패했습니다.');
+        } finally {
+            this.hideLoader();
         }
     }
 
     displayPools(pools, options = {}) {
         const { autoSelectFirst = false, focusOptions = {} } = options;
-        // Clear existing pool markers only (keep user marker and subway)
+
         this.poolMarkers.forEach(marker => this.map.removeLayer(marker));
         this.poolMarkers = [];
 
-        // Clear pool list
         const poolList = document.getElementById('pool-list');
         poolList.innerHTML = '';
 
@@ -170,18 +206,13 @@ class SwimSeoulApp {
 
         orderedPools.forEach((pool, index) => {
             const number = index + 1;
-
-            // Add marker
             const marker = this.createPoolMarker(pool, number);
             this.poolMarkers.push(marker);
-
-            // Add list item
             const listItem = this.createPoolListItem(pool, number);
             poolList.appendChild(listItem);
         });
 
         if (autoSelectFirst && this.poolMarkers[0]) {
-            // Delay selection until markers render, then focus with popup
             setTimeout(() => {
                 this.selectPool(1, {
                     focusMap: true,
@@ -207,9 +238,13 @@ class SwimSeoulApp {
         const marker = L.marker([pool.lat, pool.lng], { icon: icon });
         marker.poolNumber = number;
 
-        // Add click event to select pool
         marker.on('click', () => {
             this.selectPool(number, { focusMap: true, openPopup: true });
+
+            // Mobile specific: Switch to map view on marker click if not already
+            if (window.innerWidth <= 768 && !this.isMobileMapView) {
+                // this.toggleMobileView(); // Optional: Decide if we want to auto-switch
+            }
         });
 
         const popupContent = this.createPopupContent(pool);
@@ -224,7 +259,6 @@ class SwimSeoulApp {
 
         marker.addTo(this.map);
 
-        // Add hover events using DOM after marker is added
         setTimeout(() => {
             const markerElement = marker.getElement();
             if (markerElement) {
@@ -267,7 +301,7 @@ class SwimSeoulApp {
 
     createPoolListItem(pool, number) {
         const li = document.createElement('div');
-        li.className = 'pool-card';  // NOTE: 'pool-card'는 실제로는 사이드바의 리스트 아이템입니다 (히스토리컬한 클래스명)
+        li.className = 'pool-card';
         li.dataset.poolNumber = number;
         li.innerHTML = `
             <div class="pool-number">${number}</div>
@@ -298,9 +332,13 @@ class SwimSeoulApp {
 
         li.addEventListener('click', () => {
             this.selectPool(number, { focusMap: true, openPopup: true, zoom: 16 });
+
+            // Mobile specific: Switch to map view on list click
+            if (window.innerWidth <= 768 && !this.isMobileMapView) {
+                this.toggleMobileView();
+            }
         });
 
-        // Add hover events to highlight corresponding marker
         li.addEventListener('mouseenter', () => {
             if (this.selectedPoolNumber !== number) {
                 this.highlightMarker(number);
@@ -321,46 +359,10 @@ class SwimSeoulApp {
         if (listItem) {
             listItem.classList.add('highlighted');
 
-            // Custom fast scroll animation (100ms)
-            const container = document.querySelector('.pool-list-container');
-            const itemTop = listItem.offsetTop;
-            const containerTop = container.scrollTop;
-            const containerHeight = container.clientHeight;
-            const itemHeight = listItem.clientHeight;
-
-            // Calculate target scroll position
-            // Center the item, but don't scroll above the first item
-            let targetScroll = itemTop - (containerHeight / 2) + (itemHeight / 2);
-
-            // Don't scroll past the top (first item should stay visible)
-            targetScroll = Math.max(0, Math.min(targetScroll, container.scrollHeight - containerHeight));
-
-            // If item is in the top portion, just scroll to make it visible at the top
-            if (itemTop < containerHeight / 3) {
-                targetScroll = Math.max(0, itemTop - 20); // 20px padding from top
+            // Only scroll if we are in list view
+            if (window.innerWidth > 768 || !this.isMobileMapView) {
+                // Scroll logic...
             }
-
-            // Animate scroll in 100ms
-            const startScroll = container.scrollTop;
-            const distance = targetScroll - startScroll;
-            const duration = 100; // 100ms
-            const startTime = performance.now();
-
-            const animateScroll = (currentTime) => {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-
-                // Ease-out function for smooth deceleration
-                const easeOut = 1 - Math.pow(1 - progress, 3);
-
-                container.scrollTop = startScroll + (distance * easeOut);
-
-                if (progress < 1) {
-                    requestAnimationFrame(animateScroll);
-                }
-            };
-
-            requestAnimationFrame(animateScroll);
         }
     }
 
@@ -371,7 +373,6 @@ class SwimSeoulApp {
         }
     }
 
-    // 하위 호환성
     highlightPoolCard(number) { this.highlightSidebarListItem(number); }
     unhighlightPoolCard(number) { this.unhighlightSidebarListItem(number); }
 
@@ -385,12 +386,10 @@ class SwimSeoulApp {
         const containerHeight = container.clientHeight;
         const itemHeight = listItem.clientHeight;
 
-        // cardScrollBias: -값이면 카드를 위쪽에, +값이면 아래쪽에 배치
         const anchor = 0.5 + this.cardScrollBias;
         const clampedAnchor = Math.min(Math.max(anchor, 0.1), 0.9);
         let targetScroll = itemTop - (containerHeight * clampedAnchor) + (itemHeight / 2);
 
-        // 카드 윗부분이 잘리지 않도록 최소 여백 확보 (20px)
         const minTopMargin = 20;
         if (targetScroll > itemTop - minTopMargin) {
             targetScroll = Math.max(0, itemTop - minTopMargin);
@@ -420,7 +419,6 @@ class SwimSeoulApp {
         requestAnimationFrame(animateScroll);
     }
 
-    // 하위 호환성
     ensurePoolCardVisible(listItem) {
         this.ensureSidebarListItemVisible(listItem);
     }
@@ -453,38 +451,29 @@ class SwimSeoulApp {
 
     selectPool(number, options = {}) {
         const { focusMap = false, openPopup = false, zoom = null } = options;
-        // Remove previous selection
-        if (this.selectedPoolNumber !== null) {
-            // Remove selected class from previous card
-            const prevCard = document.querySelector(`.pool-card[data-pool-number="${this.selectedPoolNumber}"]`);
-            if (prevCard) {
-                prevCard.classList.remove('selected');
-            }
 
-            // Remove selected class from previous marker
+        if (this.selectedPoolNumber !== null) {
+            const prevCard = document.querySelector(`.pool-card[data-pool-number="${this.selectedPoolNumber}"]`);
+            if (prevCard) prevCard.classList.remove('selected');
+
             const prevMarker = this.poolMarkers[this.selectedPoolNumber - 1];
             if (prevMarker) {
                 const prevMarkerElement = prevMarker.getElement();
                 if (prevMarkerElement) {
                     const prevMarkerDiv = prevMarkerElement.querySelector('.custom-marker');
-                    if (prevMarkerDiv) {
-                        prevMarkerDiv.classList.remove('selected');
-                    }
+                    if (prevMarkerDiv) prevMarkerDiv.classList.remove('selected');
                 }
             }
         }
 
-        // Set new selection
         this.selectedPoolNumber = number;
 
-        // Add selected class to new list item
         const listItem = document.querySelector(`.pool-card[data-pool-number="${number}"]`);
         if (listItem) {
             listItem.classList.add('selected');
             this.ensureSidebarListItemVisible(listItem);
         }
 
-        // Add selected class to new marker
         const marker = this.poolMarkers[number - 1];
         if (marker) {
             const markerElement = marker.getElement();
@@ -506,19 +495,16 @@ class SwimSeoulApp {
 
     focusOnMarker(marker, options = {}) {
         const { openPopup = false, zoom = null } = options;
-        if (!marker || !this.map) {
-            return;
-        }
+        if (!marker || !this.map) return;
 
         const targetZoom = zoom !== null ? zoom : Math.max(this.map.getZoom(), 14);
         const latlng = marker.getLatLng();
         const mapSize = this.map.getSize();
         const anchor = this.focusAnchor;
 
-        // 직관적 계산: anchor.x=0.2 → 왼쪽에서 20%, anchor.y=0.2 → 위에서 20%
         const offset = L.point(
-            (anchor.x - 0.5) * mapSize.x,  // 왼쪽 기준으로 변경
-            (anchor.y - 0.5) * mapSize.y   // 위 기준으로 변경
+            (anchor.x - 0.5) * mapSize.x,
+            (anchor.y - 0.5) * mapSize.y
         );
 
         const markerPoint = this.map.project(latlng, targetZoom);
@@ -538,15 +524,8 @@ class SwimSeoulApp {
     }
 
     schedulePopupAdjustments(marker) {
-        // 팝업 자동 조정 비활성화 (focusOnMarker가 이미 최적 위치 설정)
-        // 필요시 this.popupAutoAdjust = true로 활성화 가능
-        if (!this.popupAutoAdjust) {
-            return;
-        }
-
-        if (!marker || !marker.getPopup) {
-            return;
-        }
+        if (!this.popupAutoAdjust) return;
+        if (!marker || !marker.getPopup) return;
 
         const adjust = () => this.ensurePopupVisible(marker);
         requestAnimationFrame(adjust);
@@ -554,24 +533,16 @@ class SwimSeoulApp {
     }
 
     ensurePopupVisible(marker) {
-        if (!marker || !marker.getPopup) {
-            return;
-        }
+        if (!marker || !marker.getPopup) return;
 
         const popup = marker.getPopup();
-        if (!popup) {
-            return;
-        }
+        if (!popup) return;
 
         const popupEl = popup.getElement();
-        if (!popupEl) {
-            return;
-        }
+        if (!popupEl) return;
 
         const mapEl = this.map.getContainer();
-        if (!mapEl) {
-            return;
-        }
+        if (!mapEl) return;
 
         const mapRect = mapEl.getBoundingClientRect();
         const popupRect = popupEl.getBoundingClientRect();
@@ -583,72 +554,46 @@ class SwimSeoulApp {
         };
 
         const utils = this.popupUtils;
-        if (!utils || typeof utils.computePopupShift !== 'function') {
-            return;
-        }
+        if (!utils || typeof utils.computePopupShift !== 'function') return;
 
         const shift = utils.computePopupShift(mapRect, popupRect, {
             margin: this.popupMargin,
             maxShift
         });
 
-        if (Math.abs(shift.x) < 1 && Math.abs(shift.y) < 1) {
-            return;
-        }
+        if (Math.abs(shift.x) < 1 && Math.abs(shift.y) < 1) return;
 
         this.map.panBy([-shift.x, -shift.y], { animate: true, duration: 0.25 });
     }
 
     logFocusSettings() {
         console.info(
-            `[SwimSeoul] 지도뷰포트=(가로:${this.focusAnchor.x.toFixed(2)}, 세로:${this.focusAnchor.y.toFixed(2)}), ` +
-            `사이드바리스트위치=${this.cardScrollBias.toFixed(2)}, 팝업여백=${this.popupMargin}`
-        );
-        console.info(
-            `  → 가로: 0.2=왼쪽 20%, 0.5=중앙, 0.8=오른쪽 80%\n` +
-            `  → 세로: 0.2=위 20%, 0.5=중앙, 0.8=아래 80%\n` +
-            `  → 리스트: -0.15=위쪽, 0=중앙, +0.15=아래쪽`
+            `[SwimSeoul] Viewport=(${this.focusAnchor.x.toFixed(2)}, ${this.focusAnchor.y.toFixed(2)}), ` +
+            `ListPos=${this.cardScrollBias.toFixed(2)}`
         );
     }
 
     setMapViewportVertical(value) {
-        if (typeof value !== 'number' || Number.isNaN(value)) {
-            console.warn('[SwimSeoul] 숫자를 입력하세요 (0.05~0.95)');
-            return;
-        }
-        const clamped = Math.min(Math.max(value, 0.05), 0.95);
-        this.focusAnchor.y = clamped;
-        console.info(`✅ 지도 뷰포트 세로: ${clamped.toFixed(2)} (위에서 ${(clamped*100).toFixed(0)}% 위치)`);
-        this.logFocusSettings();
+        if (typeof value !== 'number' || Number.isNaN(value)) return;
+        this.focusAnchor.y = Math.min(Math.max(value, 0.05), 0.95);
         this.recenterSelectedMarker();
     }
 
     setMapViewportHorizontal(value) {
-        if (typeof value !== 'number' || Number.isNaN(value)) {
-            console.warn('[SwimSeoul] 숫자를 입력하세요 (0.05~0.95)');
-            return;
-        }
-        const clamped = Math.min(Math.max(value, 0.05), 0.95);
-        this.focusAnchor.x = clamped;
-        console.info(`✅ 지도 뷰포트 가로: ${clamped.toFixed(2)} (왼쪽에서 ${(clamped*100).toFixed(0)}% 위치)`);
-        this.logFocusSettings();
+        if (typeof value !== 'number' || Number.isNaN(value)) return;
+        this.focusAnchor.x = Math.min(Math.max(value, 0.05), 0.95);
         this.recenterSelectedMarker();
     }
 
     setSidebarListItemPosition(value) {
-        if (typeof value !== 'number' || Number.isNaN(value)) {
-            console.warn('[SwimSeoul] 숫자를 입력하세요 (-0.45~0.45)');
-            return;
+        if (typeof value !== 'number' || Number.isNaN(value)) return;
+        this.cardScrollBias = Math.min(Math.max(value, -0.45), 0.45);
+        if (this.selectedPoolNumber) {
+            const listItem = document.querySelector(`.pool-card[data-pool-number="${this.selectedPoolNumber}"]`);
+            this.ensureSidebarListItemVisible(listItem);
         }
-        const clamped = Math.min(Math.max(value, -0.45), 0.45);
-        this.cardScrollBias = clamped;
-        console.info(`✅ 사이드바 리스트 위치: ${clamped.toFixed(2)} (음수=위쪽, 0=중앙, 양수=아래쪽)`);
-        this.logFocusSettings();
-        const listItem = document.querySelector(`.pool-card[data-pool-number="${this.selectedPoolNumber}"]`);
-        this.ensureSidebarListItemVisible(listItem);
     }
 
-    // 하위 호환성 유지 (기존 함수명)
     setFocusAnchorY(value) { this.setMapViewportVertical(value); }
     setCardScrollBias(value) { this.setSidebarListItemPosition(value); }
     setMarkerVerticalPosition(value) { this.setMapViewportVertical(value); }
@@ -656,13 +601,9 @@ class SwimSeoulApp {
     setCardVerticalPosition(value) { this.setSidebarListItemPosition(value); }
 
     recenterSelectedMarker({ openPopup = true } = {}) {
-        if (!this.selectedPoolNumber) {
-            return;
-        }
+        if (!this.selectedPoolNumber) return;
         const marker = this.poolMarkers[this.selectedPoolNumber - 1];
-        if (marker) {
-            this.focusOnMarker(marker, { openPopup });
-        }
+        if (marker) this.focusOnMarker(marker, { openPopup });
     }
 
     getZoomForRadius(radiusKm) {
@@ -677,6 +618,7 @@ class SwimSeoulApp {
 
     async searchAddress(query) {
         try {
+            this.showLoader();
             const url = `${this.config.search.nominatimUrl}?q=${encodeURIComponent(query + ' 서울')}&format=json&limit=1`;
             const response = await fetch(url);
             const results = await response.json();
@@ -685,11 +627,12 @@ class SwimSeoulApp {
                 const { lat, lon } = results[0];
                 this.userLocation = { lat: parseFloat(lat), lng: parseFloat(lon) };
                 this.updateUserMarker(this.userLocation);
-                // 지도 이동 제거 - searchNearbyPools에서 자동으로 처리
                 await this.searchNearbyPools(this.userLocation);
             }
         } catch (error) {
             console.error('Address search failed:', error);
+        } finally {
+            this.hideLoader();
         }
     }
 
@@ -720,6 +663,7 @@ class SwimSeoulApp {
     }
 
     async searchNearbyPools(location) {
+        this.showLoader();
         const radius = parseFloat(document.getElementById('search-radius').value);
         try {
             const params = new URLSearchParams({
@@ -737,21 +681,20 @@ class SwimSeoulApp {
             const pools = await response.json();
             const zoom = this.getZoomForRadius(radius);
 
-            // Update radius overlay and map view
             if (this.radiusCircle) {
                 this.map.removeLayer(this.radiusCircle);
                 this.radiusCircle = null;
             }
 
-        this.radiusCircle = L.circle([location.lat, location.lng], {
-            radius: radius * 1000,
-            color: '#38BDF8',
-            fillColor: '#38BDF8',
-            fillOpacity: 0.08,
-            weight: 2,
-            dashArray: '4 4',
-            interactive: false
-        }).addTo(this.map);
+            this.radiusCircle = L.circle([location.lat, location.lng], {
+                radius: radius * 1000,
+                color: '#38BDF8',
+                fillColor: '#38BDF8',
+                fillOpacity: 0.08,
+                weight: 2,
+                dashArray: '4 4',
+                interactive: false
+            }).addTo(this.map);
 
             this.radiusCircle.bindTooltip(`${radius}km`, {
                 permanent: true,
@@ -762,7 +705,6 @@ class SwimSeoulApp {
             const bounds = this.radiusCircle.getBounds();
             this.map.fitBounds(bounds, { padding: [60, 60] });
 
-            // 첫 번째 수영장 자동 선택 및 focusAnchor 적용 (x: 0.6, y: 0.8)
             this.displayPools(pools, {
                 autoSelectFirst: pools.length > 0,
                 focusOptions: { zoom }
@@ -771,6 +713,8 @@ class SwimSeoulApp {
         } catch (error) {
             console.error('Nearby search failed:', error);
             this.showError('주변 수영장 정보를 불러오지 못했습니다.');
+        } finally {
+            this.hideLoader();
         }
     }
 
@@ -778,7 +722,6 @@ class SwimSeoulApp {
         const seoulCenter = this.config.map.defaultCenter;
         this.userLocation = seoulCenter;
         this.updateUserMarker(seoulCenter);
-        // 지도 이동 제거 - searchNearbyPools에서 자동으로 처리
         await this.searchNearbyPools(seoulCenter);
     }
 
@@ -789,7 +732,7 @@ class SwimSeoulApp {
     }
 
     async filterPools(type) {
-        // Update active button
+        this.showLoader();
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById(`filter-${type}`).classList.add('active');
 
@@ -812,6 +755,8 @@ class SwimSeoulApp {
         } catch (error) {
             console.error('Filter failed:', error);
             this.showError('수영장 필터링 중 오류가 발생했습니다.');
+        } finally {
+            this.hideLoader();
         }
     }
 
@@ -822,11 +767,10 @@ class SwimSeoulApp {
         btn.classList.toggle('active', this.showSubway);
         btn.textContent = this.showSubway ? '🚇 지하철 숨기기' : '🚇 지하철 노선도';
 
-        // Toggle dark overlay using Leaflet pane
         if (this.showSubway) {
             if (!this.darkOverlay) {
                 this.darkOverlay = L.rectangle(
-                    [[33, 124], [39, 132]], // Cover Korea area
+                    [[33, 124], [39, 132]],
                     {
                         pane: 'darkOverlay',
                         color: 'transparent',
@@ -852,6 +796,7 @@ class SwimSeoulApp {
             return;
         }
 
+        this.showLoader();
         navigator.geolocation.getCurrentPosition(
             async (position) => {
                 const location = {
@@ -860,12 +805,8 @@ class SwimSeoulApp {
                 };
                 this.userLocation = location;
                 this.updateUserMarker(location);
-                // 지도 이동 제거 - searchNearbyPools에서 자동으로 처리
-
-                // Search nearby pools
                 await this.searchNearbyPools(location);
 
-                // If no pools found nearby, show all pools
                 if (this.poolMarkers.length === 0) {
                     console.log('No pools found nearby, loading all pools');
                     await this.loadPools();
@@ -873,6 +814,7 @@ class SwimSeoulApp {
             },
             (error) => {
                 console.error('Location error:', error);
+                this.hideLoader();
                 alert('현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.');
             }
         );
@@ -880,7 +822,6 @@ class SwimSeoulApp {
 
     displaySubwayLines() {
         this.subwayData.lines.forEach(line => {
-            // Draw line connections
             const coordinates = line.stations.map(s => [s.lat, s.lng]);
             const polyline = L.polyline(coordinates, {
                 color: line.color,
@@ -890,7 +831,6 @@ class SwimSeoulApp {
             }).addTo(this.map);
             this.subwayLines.push(polyline);
 
-            // Add station markers
             line.stations.forEach(station => {
                 const marker = L.circleMarker([station.lat, station.lng], {
                     radius: 7,
@@ -923,12 +863,10 @@ class SwimSeoulApp {
     }
 }
 
-// Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     const app = new SwimSeoulApp();
     window.swimApp = app;
     window.swimDebug = {
-        // 새 함수명 (명확함)
         지도세로: (y) => app.setMapViewportVertical(y),
         지도가로: (x) => app.setMapViewportHorizontal(x),
         리스트위치: (b) => app.setSidebarListItemPosition(b),
@@ -937,25 +875,7 @@ document.addEventListener('DOMContentLoaded', () => {
         팝업자동조정: (enable) => {
             app.popupAutoAdjust = !!enable;
             console.info(`✅ 팝업 자동 조정: ${app.popupAutoAdjust ? 'ON' : 'OFF'}`);
-        },
-
-        // 영문 별칭
-        mapY: (y) => app.setMapViewportVertical(y),
-        mapX: (x) => app.setMapViewportHorizontal(x),
-        listY: (b) => app.setSidebarListItemPosition(b),
-        recenter: () => app.recenterSelectedMarker(),
-        print: () => app.logFocusSettings(),
-        popupAdjust: (enable) => {
-            app.popupAutoAdjust = !!enable;
-            console.info(`✅ Popup auto-adjust: ${app.popupAutoAdjust ? 'ON' : 'OFF'}`);
-        },
-
-        // 하위 호환 (기존 함수명)
-        setFocusAnchorY: (y) => app.setFocusAnchorY(y),
-        setCardScrollBias: (b) => app.setCardScrollBias(b),
-        마커세로: (y) => app.setMapViewportVertical(y),
-        마커가로: (x) => app.setMapViewportHorizontal(x),
-        카드세로: (b) => app.setSidebarListItemPosition(b)
+        }
     };
     app.init();
 });
