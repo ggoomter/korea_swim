@@ -55,7 +55,7 @@ def test_add_sample_pool():
             "sat": ["08:00-12:00", "16:00-20:00"],
             "sun": ["08:00-12:00", "16:00-20:00"]
         },
-        "free_swim_price": 8000,
+        "free_swim_price": "8000",
         "lessons": [
             {"type": "초급", "price": 200000, "schedule": "월수금 19:00"},
             {"type": "중급", "price": 250000, "schedule": "화목 19:00"},
@@ -67,6 +67,9 @@ def test_add_sample_pool():
     }
 
     response = requests.post(f"{BASE_URL}{API_PREFIX}/pools/", json=pool_data)
+    if response.status_code >= 400:
+        print(f"❌ Error {response.status_code}: {response.text}")
+        response.raise_for_status()
     print(f"✅ 샘플 수영장 추가: {response.json()['name']}")
     return response.json()
 
@@ -89,7 +92,7 @@ def test_search_nearby(lat: float, lng: float, radius_km: float = 5.0):
         if distance is not None:
             print(f"    거리: {distance:.2f}km")
         if pool.get('free_swim_price'):
-            print(f"    자율수영: {pool['free_swim_price']:,}원")
+            print(f"    자율수영: {pool['free_swim_price']}원")
 
 
 def test_search_nearby_get(lat: float, lng: float, radius_km: float = 5.0):
