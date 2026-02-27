@@ -1,67 +1,90 @@
 # korea_swim 프로젝트 TODO
 
-## 현재 상태 (2026-02-26)
+## 현재 상태 (2026-02-27)
+
+### 프로젝트 범위
+- **전국 수영장 찾기**로 확장 (기존 서울 → 전국)
 
 ### 브랜치
 - `main`: feature/overhaul-upgrade 병합 완료
-- `origin/feature/overhaul-upgrade-*`: 병합됨 (삭제 가능)
 
-### DB (swimming_pools.db) - 352건
+### DB (swimming_pools.db) - 319건
 
 | 필드 | 채워진 건수 | 비율 | 비고 |
 |------|-----------|------|------|
-| daily_price | 76 | 21% | 실제 다양한 값 (3,400~50,000원) |
-| free_swim_price | 76 | 21% | |
-| monthly_lesson_price | 30 | 8% | |
-| operating_hours | 1 | 0% | 거의 없음 |
-| free_swim_times | 44 | 12% | |
-| phone | 47 | 13% | |
-| image_url | 294 | 83% | 일부 만료 URL 포함 |
-| facilities | 315 | 89% | |
+| name/address/lat/lng | 319 | 100% | |
+| facilities | 319 | 100% | |
+| url | 312 | 97% | 크롤링으로 +14건 |
+| image_url | 267 | 83% | |
+| operating_hours | 123 | 38% | 크롤링으로 0→123건 |
+| daily_price | 73 | 22% | |
+| free_swim_price | 73 | 22% | |
+| phone | 46 | 14% | 네이버 API 한계 |
+| free_swim_times | 41 | 12% | |
+
+### 지역별 분포
+
+| 지역 | 건수 |
+|------|------|
+| 서울 | 243 |
+| 부산 | 11 |
+| 경기 | 10 |
+| 제주 | 9 |
+| 대구 | 9 |
+| 인천 | 8 |
+| 대전 | 8 |
+| 광주 | 8 |
+| 울산 | 7 |
+| 세종 | 6 |
 
 ### JSON 파일
 
 | 파일 | 건수 | 상태 |
 |------|------|------|
-| advanced_pools.json | 256건 | 이름/주소/이미지만 있음, 가격/운영시간 전무, 비수영 데이터 10건 혼재 |
-| final_pools.json | 183건 | **더미 데이터** (전부 동일값: 10000원, 06:00-22:00) - 사용 불가 |
+| advanced_pools.json | 242건 | 정리 완료 (14건 비수영 삭제) |
+| final_pools.json.bak | 183건 | 백업 이동 (전체 더미 데이터) |
 
 ### 소스 분포 (DB)
-- 네이버 검색: 305건
-- 서울시공공서비스: 29건
-- 인공지능: 9건
+- 네이버 검색: 279건
+- 서울시공공데이터: 29건
+- 민간시설: 9건
 - 공공데이터: 8건
-- 테스트: 1건
 
 ---
 
 ## Phase 1: 데이터 정리 (최우선)
 
-### 1-1. 비수영 데이터 제거
-- [ ] DB에서 수영장 무관 데이터 식별 및 제거 (찜질방, 야구장, 카페, 음식점 등)
-- [ ] advanced_pools.json에서도 동일 정리
-- [ ] final_pools.json 삭제 또는 용도 재정의 (현재 더미 데이터)
+### 1-1. 비수영 데이터 제거 ✅
+- [x] DB 비수영 데이터 26건 삭제 (야구장, 카페, 모텔, 아이스링크, 놀이시설, 물놀이장, 공연장 등)
+- [x] DB 중복 데이터 7건 병합/삭제 (공공데이터↔네이버 중복, 이미지/시설정보 병합)
+- [x] advanced_pools.json 비수영 14건 삭제 (256→242건)
+- [x] final_pools.json → .bak 백업 이동 (전체 더미 데이터)
+- [x] 빈 phone 필드 NULL 정리 (273건)
 
-### 1-2. 데이터 보강 - 가격/운영시간 크롤링
-- [ ] 네이버 플레이스에서 실제 가격 크롤링 (현재 21%만 있음)
-- [ ] 운영시간 크롤링 (현재 거의 0%)
-- [ ] 자유수영 시간표 수집
-- [ ] 전화번호 수집
+### 1-2. 데이터 보강 - 통합 크롤러 실행 ✅
+- [x] `crawler/price_crawler.py` 통합 크롤러로 개선 (네이버 지역/웹 검색 + 웹사이트 크롤링)
+- [x] 운영시간 크롤링 (0% → 38%, 123건)
+- [x] URL 보강 (93% → 97%, +14건)
+- [x] 가격 크롤링 (+1건, 대부분 사이트가 JS 렌더링이라 한계)
+- [x] 자유수영 시간표 수집 (41건)
+- [x] 전화번호 수집 시도 (네이버 지역검색 API telephone 필드가 대부분 빈값, API 한계)
+- [x] API 키 환경변수 전환 (`NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`)
+- [x] `--test N`, `--dry-run` CLI 인수 추가
 
-### 1-3. 데이터 품질 검증
-- [ ] 중복 수영장 제거 (이름+주소 기준)
-- [ ] 좌표 검증 (서울 범위 내인지)
-- [ ] 이미지 URL 유효성 검사 (만료된 URL 제거)
-- [ ] DB ↔ JSON 데이터 동기화 정책 결정
+### 1-3. 데이터 품질 검증 ✅
+- [x] 중복 수영장 제거 (이름 기준 8쌍 → 7쌍 삭제, 1쌍 유지(서울/인천 별도 시설))
+- [x] 좌표 검증 → 전국 확장 결정으로 범위 제한 불필요
+- [x] 이미지 URL 검사: 만료 의심 1건 (네이버 캐시), 나머지 양호
+- [x] 불필요 파일 정리 완료
 
 ---
 
 ## Phase 2: 보안 수정
 
 ### 2-1. API 키 하드코딩 제거
+- [x] `crawler/price_crawler.py` 환경변수 전환 완료
 - [ ] `crawler/advanced_crawler.py:16-17` 네이버 API 키 → 환경변수
-- [ ] `crawler/naver_place_crawler.py` 동일
-- [ ] `crawler/price_crawler.py` 동일
+- [ ] `crawler/naver_place_crawler.py` 동일 (price_crawler에 기능 통합됨, 삭제 검토)
 - [ ] CLAUDE.md에서 API 키 노출 부분 제거
 
 ### 2-2. 서버 보안
@@ -108,9 +131,9 @@ hellgater 프로젝트의 release 브랜치 패턴 참고:
 
 ---
 
-## 불필요 파일 정리 대상
-- `check_sillim_detail.py` (untracked, 테스트용)
-- `find_example.py` (untracked, 테스트용)
-- `test_sillim.py` (untracked, 테스트용)
-- `final_pools.json` (더미 데이터)
-- `changes.diff` (feature 브랜치에서 삭제됨)
+## 불필요 파일 정리 ✅
+- [x] `check_sillim_detail.py` 삭제
+- [x] `find_example.py` 삭제
+- [x] `test_sillim.py` 삭제
+- [x] `final_pools.json.bak` 삭제
+- [x] `swimming_pools.db.bak` 삭제

@@ -505,23 +505,6 @@
     ]
   },
   {
-    "name": "골근위수영뷰티아카데미학원 청담",
-    "address": "서울특별시 강남구 청담동 125-12 금원빌딩 3층",
-    "lat": 37.5251542,
-    "lng": 127.0525637,
-    "phone": "",
-    "category": "직업,기술교육>미용교육",
-    "source": "네이버 검색",
-    "image_url": "https://ldb-phinf.pstatic.net/20190503_100/1556870075969djTAu_JPEG/FEEma5lfGhH_PL96Kz6muoFc.JPG.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
     "name": "와우스포츠아카데미",
     "address": "서울특별시 영등포구 여의도동 42",
     "lat": 37.5206702,
@@ -751,40 +734,6 @@
     "category": "스포츠,오락>수영장",
     "source": "네이버 검색",
     "image_url": "https://ldb-phinf.pstatic.net/20250703_192/1751520387228zXA0R_JPEG/KakaoTalk_20240711_154937044_09.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
-    "name": "옥토끼우주센터",
-    "address": "인천광역시 강화군 불은면 두운리 1026 옥토끼우주센터",
-    "lat": 37.6742008,
-    "lng": 126.487157,
-    "phone": "",
-    "category": "여행,명소>테마파크",
-    "source": "네이버 검색",
-    "image_url": "http://imgnews.naver.net/image/421/2024/07/08/0007649836_001_20240708145819454.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
-    "name": "야자수판다마을",
-    "address": "인천광역시 서구 금곡동 247-2 야자수판다마을",
-    "lat": 37.6121719,
-    "lng": 126.6463219,
-    "phone": "",
-    "category": "스포츠,오락>수영장",
-    "source": "네이버 검색",
-    "image_url": "http://shop1.phinf.naver.net/20250524_121/1748086475280F3XvA_JPEG/61971754069953943_1156736045.jpg",
     "daily_price": null,
     "free_swim_price": null,
     "operating_hours": null,
@@ -1269,23 +1218,6 @@
     ]
   },
   {
-    "name": "멍클라쓰",
-    "address": "울산광역시 동구 일산동 971-3",
-    "lat": 35.4923588,
-    "lng": 129.4284748,
-    "phone": "",
-    "category": "애견카페",
-    "source": "네이버 검색",
-    "image_url": "http://timg.humoruniv.com/thumb_crop_resize.php?url=http://down.humoruniv.com//hwiparambbs/data/editor/pdswait/e_s64bf58001_14b107efa9a7f9ca9616c79b5a503a527f78b379.jpg?SIZE=800x800",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
     "name": "울산북구국민체육센터",
     "address": "울산광역시 북구 신천동 578-1",
     "lat": 35.6427359,
@@ -1328,23 +1260,6 @@
     "category": "스포츠,오락>수영장",
     "source": "네이버 검색",
     "image_url": "https://ldb-phinf.pstatic.net/20250910_74/1757494615907XUMNl_JPEG/%C0%DA%C0%AF%BC%F6%BF%B5_%BD%C3%B0%A3%C7%A5.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
-    "name": "오감 놀이터",
-    "address": "세종특별자치시 종촌동 673 몰리브 4층 403-1호, 403-2호",
-    "lat": 36.5026384,
-    "lng": 127.247577,
-    "phone": "",
-    "category": "키즈카페,실내놀이터",
-    "source": "네이버 검색",
-    "image_url": "http://imgnews.naver.net/image/5069/2014/07/25/65245_45462_5357_59_20140725162503.jpg",
     "daily_price": null,
     "free_swim_price": null,
     "operating_hours": null,
@@ -1608,23 +1523,6 @@
     ]
   },
   {
-    "name": "도그렉스",
-    "address": "제주특별자치도 제주시 조천읍 조천리 649 나동 1층",
-    "lat": 33.5360292,
-    "lng": 126.6498609,
-    "phone": "",
-    "category": "애견카페",
-    "source": "네이버 검색",
-    "image_url": "http://imgnews.naver.net/image/5613/2021/07/21/0000052569_002_20210721181231939.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
     "name": "제주스쿠버스쿨 스쿠버다이빙",
     "address": "제주특별자치도 서귀포시 서호동 153 제주스쿠버스쿨",
     "lat": 33.2480563,
@@ -1871,23 +1769,6 @@
     "category": "스포츠,오락>수영장",
     "source": "네이버 검색",
     "image_url": "https://ldb-phinf.pstatic.net/20230906_89/1693988384517Xno9r_PNG/%BE%EE%BF%EF%B8%B2%B7%CE%B0%ED.png",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
-    "name": "초이스바이반트",
-    "address": "서울특별시 강동구 고덕동 353-23 아이파크 더리버 4F",
-    "lat": 37.5666604,
-    "lng": 127.1573288,
-    "phone": "",
-    "category": "스포츠,오락>스포츠시설",
-    "source": "네이버 검색",
-    "image_url": "http://imgnews.naver.net/image/020/2021/10/13/0003386892_001_20211013050812242.jpg",
     "daily_price": null,
     "free_swim_price": null,
     "operating_hours": null,
@@ -2185,22 +2066,6 @@
     ]
   },
   {
-    "name": "URBAN HOTEL GOLF 신림직영점",
-    "address": "서울특별시 관악구 신림동 1569-5",
-    "lat": 37.4813762,
-    "lng": 126.9149899,
-    "phone": "",
-    "category": "숙박>호텔",
-    "source": "네이버 검색",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
     "name": "신림체육센터수영장",
     "address": "서울특별시 관악구 신림동 산197-31",
     "lat": 37.4799983,
@@ -2243,23 +2108,6 @@
     "category": "스포츠,오락>수영장",
     "source": "네이버 검색",
     "image_url": "http://imgnews.naver.net/image/5448/2025/07/14/0000008496_001_20250714080214632.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
-    "name": "뚝섬한강공원 눈썰매장",
-    "address": "서울특별시 광진구 자양동 112 뚝섬 한강공원 수영장",
-    "lat": 37.5299711,
-    "lng": 127.0668739,
-    "phone": "",
-    "category": "레저,테마",
-    "source": "네이버 검색",
-    "image_url": "http://imgnews.naver.net/image/003/2010/12/16/NISI20101216_0003825616_web.jpg",
     "daily_price": null,
     "free_swim_price": null,
     "operating_hours": null,
@@ -2396,23 +2244,6 @@
     "category": "스포츠,오락>수영장",
     "source": "네이버 검색",
     "image_url": "https://ldb-phinf.pstatic.net/20200620_63/1592620391600PoYpn_JPEG/irIOmWtCh2OxHrNxI7Xz0F-w.jpeg.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
-    "name": "고척스카이돔",
-    "address": "서울특별시 구로구 고척동 63-6",
-    "lat": 37.4982105,
-    "lng": 126.8672613,
-    "phone": "",
-    "category": "스포츠,오락>프로야구장",
-    "source": "네이버 검색",
-    "image_url": "http://imgnews.naver.net/image/001/2015/08/11/PYH2015081012660001300_P2_99_20150811060219.jpg",
     "daily_price": null,
     "free_swim_price": null,
     "operating_hours": null,
@@ -3693,22 +3524,6 @@
     ]
   },
   {
-    "name": "여의도한강공원 눈썰매장",
-    "address": "서울특별시 영등포구 여의도동 82-3 한강공원 여의도 수영장",
-    "lat": 37.5338109,
-    "lng": 126.9190647,
-    "phone": "",
-    "category": "레저,테마",
-    "source": "네이버 검색",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
     "name": "문래청소년수련관 수영장",
     "address": "서울특별시 영등포구 문래동3가 73",
     "lat": 37.518869,
@@ -3768,22 +3583,6 @@
     "category": "스포츠,오락>수영장",
     "source": "네이버 검색",
     "image_url": "https://imgssl.ezday.co.kr/cache/board/2010/10/09/afee53d6c5955a22d6e3dcd2b116159c.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
-    "name": "그랜드하얏트서울 아이스링크",
-    "address": "서울특별시 용산구 한남동 747-7",
-    "lat": 37.5391392,
-    "lng": 126.9980153,
-    "phone": "",
-    "category": "스포츠,오락>아이스링크",
-    "source": "네이버 검색",
     "daily_price": null,
     "free_swim_price": null,
     "operating_hours": null,
@@ -3946,23 +3745,6 @@
     ]
   },
   {
-    "name": "롯데몰 은평점",
-    "address": "서울특별시 은평구 진관동 63",
-    "lat": 37.6373002,
-    "lng": 126.9179678,
-    "phone": "",
-    "category": "쇼핑,유통>쇼핑복합시설",
-    "source": "네이버 검색",
-    "image_url": "http://imgnews.naver.net/image/5410/2018/07/25/0000042732_001_20180725111317905.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
     "name": "서울북한산럭셔리카라반&amp;수영장글램핑",
     "address": "서울특별시 은평구 진관동 330-14",
     "lat": 37.6509963,
@@ -4107,23 +3889,6 @@
     "category": "문화,예술>공연장",
     "source": "네이버 검색",
     "image_url": "http://imgnews.naver.net/image/5331/2025/08/08/0000082531_001_20250808093409000.jpg",
-    "daily_price": null,
-    "free_swim_price": null,
-    "operating_hours": null,
-    "free_swim_times": null,
-    "facilities": [
-      "수영장"
-    ]
-  },
-  {
-    "name": "반얀트리 클럽 앤 스파 서울 오아시스 아이스링크",
-    "address": "서울특별시 중구 장충동2가 201",
-    "lat": 37.5506051,
-    "lng": 127.0029308,
-    "phone": "",
-    "category": "스포츠,오락>아이스링크",
-    "source": "네이버 검색",
-    "image_url": "http://imgnews.naver.net/image/003/2016/05/19/NISI20160519_0011708721_web_99_20160519112203.jpg",
     "daily_price": null,
     "free_swim_price": null,
     "operating_hours": null,
