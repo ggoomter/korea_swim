@@ -80,6 +80,44 @@
                             <option value="20">20km</option>
                         </select>
                     </div>
+                    <div class="control-group">
+                        <label for="filter-day">요일</label>
+                        <select class="control-select" id="filter-day">
+                            <option value="">전체</option>
+                            <option value="월">월</option>
+                            <option value="화">화</option>
+                            <option value="수">수</option>
+                            <option value="목">목</option>
+                            <option value="금">금</option>
+                            <option value="토">토</option>
+                            <option value="일">일</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="filter-time">시간대</label>
+                        <select class="control-select" id="filter-time">
+                            <option value="">전체</option>
+                            <option value="06:00">오전 (06~12)</option>
+                            <option value="13:00">오후 (12~18)</option>
+                            <option value="19:00">저녁 (18~22)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="filter-max-price">자유수영 가격</label>
+                        <select class="control-select" id="filter-max-price">
+                            <option value="">전체</option>
+                            <option value="3000">~3,000원</option>
+                            <option value="5000">~5,000원</option>
+                            <option value="10000">~10,000원</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="filter-sort">정렬</label>
+                        <select class="control-select" id="filter-sort">
+                            <option value="distance">거리순</option>
+                            <option value="price">가격순</option>
+                        </select>
+                    </div>
                     <button class="btn-secondary" id="search-current">📍 내 위치에서 검색</button>
                     <button class="btn-secondary" id="search-seoul">🏙️ 서울 중심 검색</button>
                     <button class="btn-subway" id="toggle-subway">🚇 지하철 노선도</button>

@@ -15,6 +15,8 @@ def get_pools(
     has_free_swim: Optional[bool] = None,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
+    day: Optional[str] = Query(None, description="요일 필터 (월~일)"),
+    time: Optional[str] = Query(None, description="시간 필터 (HH:MM)"),
     db: Session = Depends(get_db)
 ):
     """모든 수영장 조회"""
@@ -25,7 +27,9 @@ def get_pools(
         source=source,
         has_free_swim=has_free_swim,
         min_price=min_price,
-        max_price=max_price
+        max_price=max_price,
+        day=day,
+        time=time,
     )
     return pools
 
@@ -36,7 +40,7 @@ def create_pool(pool: SwimmingPoolCreate, db: Session = Depends(get_db)):
 
 @router.post("/search", response_model=List[SwimmingPoolResponse])
 def search_pools(search: SwimmingPoolSearch, db: Session = Depends(get_db)):
-    """위치 기반 수영장 검색"""
+    """위치 기반 수영장 검색 (POST)"""
     pools = crud.search_nearby_pools(
         db=db,
         lat=search.lat,
@@ -45,7 +49,8 @@ def search_pools(search: SwimmingPoolSearch, db: Session = Depends(get_db)):
         min_price=search.min_price,
         max_price=search.max_price,
         has_free_swim=search.has_free_swim,
-        only_with_price=False  # 기본적으로 모든 수영장 반환 (가격 추정 포함)
+        day=search.day,
+        time=search.time,
     )
     return pools
 
@@ -55,13 +60,19 @@ def get_nearby_pools(
     lat: float = Query(..., description="위도"),
     lng: float = Query(..., description="경도"),
     radius: float = Query(5.0, ge=0.1, le=50.0, description="검색 반경 (km)"),
-    min_price: Optional[int] = None,
-    max_price: Optional[int] = None,
-    has_free_swim: Optional[bool] = None,
-    only_with_price: bool = Query(False, description="가격 정보가 있는 수영장만 표시"),
+    min_price: Optional[int] = Query(None, description="최소 가격 (자유수영 성인 평일)"),
+    max_price: Optional[int] = Query(None, description="최대 가격 (자유수영 성인 평일)"),
+    has_free_swim: Optional[bool] = Query(None, description="자유수영 시간표 보유 여부"),
+    day: Optional[str] = Query(None, description="요일 필터 (월~일)"),
+    time: Optional[str] = Query(None, description="시간 필터 (HH:MM)"),
+    sort: Optional[str] = Query(None, description="정렬 (price/distance)"),
     db: Session = Depends(get_db)
 ):
-    """쿼리 파라미터 기반 위치 검색 (프론트엔드용)"""
+    """쿼리 파라미터 기반 위치 검색 (프론트엔드용)
+
+    필터 예시:
+      ?lat=37.5&lng=126.9&radius=5&day=토&max_price=5000&sort=price
+    """
     pools = crud.search_nearby_pools(
         db=db,
         lat=lat,
@@ -70,8 +81,18 @@ def get_nearby_pools(
         min_price=min_price,
         max_price=max_price,
         has_free_swim=has_free_swim,
-        only_with_price=only_with_price
+        day=day,
+        time=time,
+        sort=sort,
     )
+
+    # 시간 필터 후처리 (SQL에서 처리 불가한 시간 범위 비교)
+    if time and day:
+        pools = [
+            p for p in pools
+            if crud.is_time_in_schedule(p.free_swim_schedule, day, time)
+        ]
+
     return pools
 
 

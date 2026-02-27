@@ -394,6 +394,15 @@ body {
     line-height: 1.4;
 }
 
+.pool-phone,
+.pool-hours,
+.pool-lanes {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 3px 0;
+    line-height: 1.4;
+}
+
 .pool-meta {
     display: flex;
     gap: 6px;
@@ -1037,4 +1046,179 @@ body {
     height: 1px;
     background: linear-gradient(to right, transparent, var(--border), transparent);
     margin: 15px 0;
+}
+
+/* Pricing Table (popup) */
+.pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 10px 0;
+}
+
+.pricing-table th {
+    background: var(--background);
+    padding: 6px 8px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+}
+
+.pricing-table td {
+    padding: 5px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.pricing-table td:first-child {
+    text-align: left;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.pricing-table .price-highlight {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* Weekly Schedule Table (popup) */
+.weekly-schedule {
+    margin: 10px 0;
+}
+
+.weekly-schedule-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.weekly-schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.schedule-day {
+    text-align: center;
+    padding: 4px 2px;
+    border-radius: 8px;
+    background: var(--background);
+    border: 1px solid var(--border);
+}
+
+.schedule-day.today {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: var(--primary);
+}
+
+.schedule-day-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.schedule-day.today .schedule-day-label {
+    color: var(--primary);
+}
+
+.schedule-day-times {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.schedule-time-slot {
+    font-size: 8px;
+    padding: 2px 0;
+    border-radius: 3px;
+    background: rgba(14, 165, 233, 0.08);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.schedule-day.today .schedule-time-slot {
+    background: var(--primary);
+    color: white;
+}
+
+.schedule-no-time {
+    font-size: 9px;
+    color: var(--text-muted);
+    opacity: 0.4;
+}
+
+/* Card: 오늘 자유수영 정보 */
+.card-today-info {
+    display: flex;
+    gap: 12px;
+    margin: 8px 0;
+    padding: 8px 10px;
+    background: rgba(14, 165, 233, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(14, 165, 233, 0.1);
+}
+
+.card-today-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.card-today-price .price-unit {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.card-today-times {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.card-time-chip {
+    font-size: 11px;
+    padding: 2px 6px;
+    background: var(--primary);
+    color: white;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.card-time-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Popup 가격표 섹션 */
+.popup-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin: 12px 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 비고 */
+.popup-notes {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--background);
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    line-height: 1.5;
 }

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Any
 from datetime import datetime
 
 class SwimmingPoolBase(BaseModel):
@@ -13,12 +13,10 @@ class SwimmingPoolBase(BaseModel):
     pool_size: Optional[str] = None
     water_temp: Optional[str] = None
     facilities: Optional[List[str]] = None
-    membership_prices: Optional[Dict] = None
-    daily_price: Optional[str] = None  # 일일권 가격 (예: "10000")
-    monthly_lesson_price: Optional[str] = None  # 한달 수강권 (예: "150000" 또는 "가격 다양, 표 참조")
-    free_swim_times: Optional[Dict] = None
-    free_swim_price: Optional[str] = None  # 자유수영 (예: "8000" 또는 "시간대별 상이")
-    lessons: Optional[List[Dict]] = None
+    pricing: Optional[Dict[str, Any]] = None
+    free_swim_schedule: Optional[Dict[str, Any]] = None
+    notes: Optional[str] = None
+    parking: Optional[bool] = None
     source: str
     url: Optional[str] = None
     image_url: Optional[str] = None
@@ -30,9 +28,11 @@ class SwimmingPoolCreate(SwimmingPoolBase):
 
 class SwimmingPoolResponse(SwimmingPoolBase):
     id: int
-    last_updated: datetime
-    is_active: bool
-    review_count: int
+    last_updated: Optional[datetime] = None
+    is_active: bool = True
+    review_count: int = 0
+    enrichment_status: Optional[str] = None
+    last_enriched: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -40,7 +40,9 @@ class SwimmingPoolResponse(SwimmingPoolBase):
 class SwimmingPoolSearch(BaseModel):
     lat: float
     lng: float
-    radius_km: float = 5.0  # 기본 5km 반경
+    radius_km: float = 5.0
     min_price: Optional[int] = None
     max_price: Optional[int] = None
     has_free_swim: Optional[bool] = None
+    day: Optional[str] = None  # 요일 필터: "월"~"일"
+    time: Optional[str] = None  # 시간 필터: "HH:MM"

@@ -19,10 +19,59 @@ class SwimSeoulApp {
         this.cardScrollBias = 0;
         this.popupAutoAdjust = false;
 
+        // 요일 매핑
+        this.DAY_NAMES_KR = ['일', '월', '화', '수', '목', '금', '토'];
+        this.WEEKDAYS_KR = ['월', '화', '수', '목', '금', '토', '일'];
+
         // New UI Elements
         this.loader = document.getElementById('loader');
         this.isMobileMapView = false;
     }
+
+    // ─── 요일/시간 헬퍼 ───────────────────────────────
+
+    getTodayDayKr() {
+        return this.DAY_NAMES_KR[new Date().getDay()];
+    }
+
+    isWeekend() {
+        const day = new Date().getDay();
+        return day === 0 || day === 6;
+    }
+
+    getTodayFreeSwim(pool) {
+        if (!pool.free_swim_schedule) return [];
+        const schedule = typeof pool.free_swim_schedule === 'string'
+            ? JSON.parse(pool.free_swim_schedule)
+            : pool.free_swim_schedule;
+        const today = this.getTodayDayKr();
+        return schedule[today] || [];
+    }
+
+    getTodayPrice(pool) {
+        if (!pool.pricing) return null;
+        const pricing = typeof pool.pricing === 'string'
+            ? JSON.parse(pool.pricing)
+            : pool.pricing;
+
+        // 자유수영 > 성인 우선, 없으면 일일권 > 성인
+        const categories = ['자유수영', '일일권'];
+        const dayType = this.isWeekend() ? '주말' : '평일';
+
+        for (const cat of categories) {
+            const catData = pricing[cat];
+            if (!catData) continue;
+            const adult = catData['성인'];
+            if (!adult) continue;
+            if (typeof adult === 'number') return adult;
+            if (typeof adult === 'object') {
+                return adult[dayType] || adult['평일'] || Object.values(adult)[0] || null;
+            }
+        }
+        return null;
+    }
+
+    // ─── 포맷터 ───────────────────────────────────────
 
     isPublicSource(source) {
         if (!source) return false;
@@ -30,33 +79,83 @@ class SwimSeoulApp {
     }
 
     formatPrice(price) {
-        if (!price) return '문의';
-        if (/^\d+$/.test(String(price))) {
-            return parseInt(price).toLocaleString() + '원';
+        if (!price && price !== 0) return '문의';
+        const num = parseInt(price);
+        if (isNaN(num)) return price;
+        return num.toLocaleString() + '원';
+    }
+
+    formatOperatingHours(hours) {
+        if (!hours) return '';
+        const parsed = typeof hours === 'string' ? JSON.parse(hours) : hours;
+
+        // 새 구조: {"월": "06:00-22:00", ...} (한글 요일 키)
+        const weekdays = ['월', '화', '수', '목', '금'];
+        const weekdayHours = weekdays.map(d => parsed[d]).filter(Boolean);
+        const satHours = parsed['토'];
+        const sunHours = parsed['일'];
+
+        const parts = [];
+
+        // 평일이 모두 같으면 하나로 표시
+        if (weekdayHours.length > 0) {
+            const allSame = weekdayHours.every(h => h === weekdayHours[0]);
+            if (allSame) {
+                parts.push(`평일 ${weekdayHours[0]}`);
+            } else {
+                weekdays.forEach(d => {
+                    if (parsed[d]) parts.push(`${d} ${parsed[d]}`);
+                });
+            }
         }
-        return price;
+
+        // 영문 키 호환 (기존 데이터)
+        if (weekdayHours.length === 0) {
+            const engLabels = {
+                weekday: '평일', weekend: '주말', saturday: '토', sunday: '일',
+                'mon-fri': '평일', sat: '토', sun: '일',
+                mon: '월', tue: '화', wed: '수', thu: '목', fri: '금'
+            };
+            for (const [key, value] of Object.entries(parsed)) {
+                if (value && value !== '휴관' && engLabels[key]) {
+                    parts.push(`${engLabels[key]} ${value}`);
+                }
+            }
+        } else {
+            if (satHours) parts.push(`토 ${satHours}`);
+            if (sunHours) parts.push(`일 ${sunHours}`);
+        }
+
+        return parts.join(' / ') || '';
     }
 
     isNowOpen(operatingHours) {
         if (!operatingHours) return { status: 'unknown', text: '운영시간 정보 없음' };
 
         try {
+            const parsed = typeof operatingHours === 'string'
+                ? JSON.parse(operatingHours)
+                : operatingHours;
             const now = new Date();
-            const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-            const day = days[now.getDay()];
+            const todayKr = this.getTodayDayKr();
             const currentTime = now.getHours() * 60 + now.getMinutes();
 
-            let todayHours = operatingHours[day];
+            // 한글 요일 키로 먼저 조회
+            let todayHours = parsed[todayKr];
 
+            // 영문 키 폴백
             if (!todayHours) {
-                if (['mon', 'tue', 'wed', 'thu', 'fri'].includes(day) && operatingHours['mon-fri']) {
-                    todayHours = operatingHours['mon-fri'];
-                } else if (['sat', 'sun'].includes(day) && operatingHours['weekend']) {
-                    todayHours = operatingHours['weekend'];
-                } else if (day === 'sat' && operatingHours['sat']) {
-                    todayHours = operatingHours['sat'];
-                } else if (day === 'sun' && operatingHours['sun']) {
-                    todayHours = operatingHours['sun'];
+                const engDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+                const engDay = engDays[now.getDay()];
+                todayHours = parsed[engDay];
+
+                if (!todayHours) {
+                    if (['mon', 'tue', 'wed', 'thu', 'fri'].includes(engDay)) {
+                        todayHours = parsed['mon-fri'] || parsed['weekday'];
+                    }
+                    if (['sat', 'sun'].includes(engDay)) {
+                        todayHours = parsed['weekend'] || parsed[engDay];
+                    }
                 }
             }
 
@@ -83,8 +182,10 @@ class SwimSeoulApp {
         }
     }
 
+    // ─── 네비게이션 ───────────────────────────────────
+
     openNavigation(pool, platform) {
-        const { name, lat, lng, address } = pool;
+        const { name, lat, lng } = pool;
         let url = '';
         if (platform === 'naver') {
             url = `https://map.naver.com/v5/search/${encodeURIComponent(name)}/place?c=${lng},${lat},15,0,0,0,dh`;
@@ -95,6 +196,8 @@ class SwimSeoulApp {
         }
         if (url) window.open(url, '_blank');
     }
+
+    // ─── 렌더링 헬퍼 ─────────────────────────────────
 
     renderFacilityIcons(facilities) {
         if (!facilities || !Array.isArray(facilities)) return '';
@@ -125,38 +228,106 @@ class SwimSeoulApp {
         `;
     }
 
-    renderFreeSwimTimetable(times) {
-        if (!times || typeof times !== 'object') return '';
+    renderPricingTable(pricing) {
+        if (!pricing) return '';
+        const parsed = typeof pricing === 'string' ? JSON.parse(pricing) : pricing;
 
-        const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-        const dayLabels = { mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일' };
-        const todayIdx = (new Date().getDay() + 6) % 7;
+        // 자유수영 가격표 렌더링
+        const freeSwim = parsed['자유수영'];
+        if (!freeSwim) return '';
 
-        return `
-            <div class="timetable-container">
-                <div class="timetable-header">
-                    <span>🏊 자유수영 시간표</span>
-                    <span style="font-size: 9px; opacity: 0.7;">타임별 상이</span>
-                </div>
-                <div class="timetable-grid">
-                    ${days.map((day, idx) => {
-            const dayTimes = times[day] || [];
-            const isToday = idx === todayIdx;
-            return `
-                            <div class="day-slot ${isToday ? 'today' : ''}">
-                                <span class="day-label">${dayLabels[day]}</span>
-                                <div class="time-pill-container">
-                                    ${dayTimes.length > 0 ?
-                    dayTimes.map(t => `<span class="time-pill">${t.split('-')[0]}</span>`).join('')
-                    : '<span class="time-pill" style="opacity:0.3">-</span>'}
-                                </div>
-                            </div>
-                        `;
-        }).join('')}
-                </div>
-            </div>
+        const targets = Object.keys(freeSwim);
+        if (targets.length === 0) return '';
+
+        let html = `
+            <div class="popup-section-title">💰 자유수영 가격</div>
+            <table class="pricing-table">
+                <thead><tr><th>대상</th><th>평일</th><th>주말</th></tr></thead>
+                <tbody>
         `;
+
+        for (const target of targets) {
+            const data = freeSwim[target];
+            let weekday = '-', weekend = '-';
+
+            if (typeof data === 'number') {
+                weekday = this.formatPrice(data);
+                weekend = weekday;
+            } else if (typeof data === 'object') {
+                weekday = data['평일'] ? this.formatPrice(data['평일']) : '-';
+                weekend = data['주말'] ? this.formatPrice(data['주말']) : '-';
+            }
+
+            html += `<tr>
+                <td>${target}</td>
+                <td class="price-highlight">${weekday}</td>
+                <td class="price-highlight">${weekend}</td>
+            </tr>`;
+        }
+
+        html += '</tbody></table>';
+
+        // 강습 가격 (있을 때만)
+        const lesson = parsed['강습_월'];
+        if (lesson) {
+            html += '<div class="popup-section-title">📚 강습 (월)</div><div style="font-size:12px; margin-bottom:8px;">';
+            for (const [target, price] of Object.entries(lesson)) {
+                html += `<span style="margin-right:12px;">${target}: <strong>${this.formatPrice(price)}</strong></span>`;
+            }
+            html += '</div>';
+        }
+
+        return html;
     }
+
+    renderWeeklySchedule(schedule) {
+        if (!schedule) return '';
+        const parsed = typeof schedule === 'string' ? JSON.parse(schedule) : schedule;
+        const todayKr = this.getTodayDayKr();
+
+        let html = `
+            <div class="weekly-schedule">
+                <div class="weekly-schedule-header">🏊 자유수영 시간표</div>
+                <div class="weekly-schedule-grid">
+        `;
+
+        for (const day of this.WEEKDAYS_KR) {
+            const times = parsed[day] || [];
+            const isToday = day === todayKr;
+
+            html += `<div class="schedule-day ${isToday ? 'today' : ''}">
+                <div class="schedule-day-label">${day}</div>
+                <div class="schedule-day-times">`;
+
+            if (Array.isArray(times) && times.length > 0) {
+                for (const t of times) {
+                    const startTime = t.split('-')[0];
+                    html += `<div class="schedule-time-slot">${startTime}</div>`;
+                }
+            } else {
+                html += '<div class="schedule-no-time">-</div>';
+            }
+
+            html += '</div></div>';
+        }
+
+        html += '</div>';
+
+        // 휴관 정보
+        if (parsed['휴관']) {
+            html += `<div style="font-size:10px; color:var(--text-muted); margin-top:6px;">휴관: ${parsed['휴관']}</div>`;
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    // 기존 renderFreeSwimTimetable도 새 구조로 대응 (팝업용)
+    renderFreeSwimTimetable(schedule) {
+        return this.renderWeeklySchedule(schedule);
+    }
+
+    // ─── 로더 ─────────────────────────────────────────
 
     showLoader() {
         if (this.loader) this.loader.classList.remove('hidden');
@@ -165,32 +336,22 @@ class SwimSeoulApp {
     hideLoader() {
         if (this.loader) this.loader.classList.add('hidden');
     }
-    }
+
+    // ─── 초기화 ───────────────────────────────────────
 
     async init() {
         try {
             this.showLoader();
-
-            // Load configuration and data
             await this.loadConfig();
             await this.loadSubwayData();
-
-            // Initialize map
             this.initMap();
-
-            // Setup event listeners
             this.setupEventListeners();
-
-            // Load pools
             await this.loadPools();
-
-            console.log('✅ SwimSeoul initialized successfully');
+            console.log('SwimSeoul initialized successfully');
             this.logFocusSettings();
-
-            // Initial loader hide
             this.hideLoader();
         } catch (error) {
-            console.error('❌ Failed to initialize app:', error);
+            console.error('Failed to initialize app:', error);
             this.showError('앱을 초기화하는 중 오류가 발생했습니다.');
             this.hideLoader();
         }
@@ -234,6 +395,25 @@ class SwimSeoulApp {
         this.map.getPane('darkOverlay').style.pointerEvents = 'none';
     }
 
+    // ─── 필터 파라미터 수집 ───────────────────────────
+
+    getFilterParams() {
+        const params = {};
+        const day = document.getElementById('filter-day')?.value;
+        const time = document.getElementById('filter-time')?.value;
+        const maxPrice = document.getElementById('filter-max-price')?.value;
+        const sort = document.getElementById('filter-sort')?.value;
+
+        if (day) params.day = day;
+        if (time) params.time = time;
+        if (maxPrice) params.max_price = maxPrice;
+        if (sort && sort !== 'distance') params.sort = sort;
+
+        return params;
+    }
+
+    // ─── 이벤트 리스너 ───────────────────────────────
+
     setupEventListeners() {
         // Address search
         const addressInput = document.getElementById('address-search');
@@ -263,9 +443,22 @@ class SwimSeoulApp {
         document.getElementById('search-seoul').addEventListener('click', () => this.searchSeoulCenter());
 
         // Radius change
-        document.getElementById('search-radius').addEventListener('change', (e) => {
-            this.searchByRadius(parseFloat(e.target.value));
+        document.getElementById('search-radius').addEventListener('change', () => {
+            if (this.userLocation) this.searchNearbyPools(this.userLocation);
         });
+
+        // 새 필터 변경 시 재검색
+        const filterIds = ['filter-day', 'filter-time', 'filter-max-price', 'filter-sort'];
+        for (const id of filterIds) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', () => {
+                    if (this.userLocation) {
+                        this.searchNearbyPools(this.userLocation);
+                    }
+                });
+            }
+        }
 
         // Mobile View Toggle
         const mobileToggleBtn = document.getElementById('mobile-toggle');
@@ -287,6 +480,8 @@ class SwimSeoulApp {
             btn.innerHTML = '<span class="icon">🗺️</span><span class="text">지도 보기</span>';
         }
     }
+
+    // ─── 데이터 로드 ──────────────────────────────────
 
     async loadPools() {
         try {
@@ -345,6 +540,8 @@ class SwimSeoulApp {
         }
     }
 
+    // ─── 마커 생성 ────────────────────────────────────
+
     createPoolMarker(pool, number) {
         const icon = L.divIcon({
             html: `
@@ -362,17 +559,12 @@ class SwimSeoulApp {
 
         marker.on('click', () => {
             this.selectPool(number, { focusMap: true, openPopup: true });
-
-            // Mobile specific: Switch to map view on marker click if not already
-            if (window.innerWidth <= 768 && !this.isMobileMapView) {
-                // this.toggleMobileView(); // Optional: Decide if we want to auto-switch
-            }
         });
 
         const popupContent = this.createPopupContent(pool);
         marker.bindPopup(popupContent, {
-            maxWidth: 320,
-            maxHeight: 460,
+            maxWidth: 340,
+            maxHeight: 500,
             offset: [0, -18],
             autoPan: false,
             closeButton: true,
@@ -406,9 +598,12 @@ class SwimSeoulApp {
         return marker;
     }
 
+    // ─── 팝업 (상세 정보) ─────────────────────────────
+
     createPopupContent(pool) {
         const openInfo = this.isNowOpen(pool.operating_hours);
         const statusClass = `status-${openInfo.status}`;
+        const todayPrice = this.getTodayPrice(pool);
 
         return `
             <div class="pool-popup">
@@ -425,31 +620,66 @@ class SwimSeoulApp {
                     <span class="popup-icon">☎️</span>
                     <span class="popup-text">${pool.phone || '정보 없음'}</span>
                 </div>
-                <div class="popup-price-grid">
-                    <div class="popup-price-item">
-                        <span class="price-label">한달 수강</span>
-                        <span class="price-value">${this.formatPrice(pool.monthly_lesson_price)}</span>
-                    </div>
-                    <div class="popup-price-item">
-                        <span class="price-label">자유 수영</span>
-                        <span class="price-value">${this.formatPrice(pool.free_swim_price)}</span>
-                    </div>
-                </div>
+                ${todayPrice ? `
+                <div class="popup-info-row">
+                    <span class="popup-icon">💰</span>
+                    <span class="popup-text">자유수영 ${this.formatPrice(todayPrice)} (${this.isWeekend() ? '주말' : '평일'})</span>
+                </div>` : ''}
+                ${pool.operating_hours ? `
+                <div class="popup-info-row">
+                    <span class="popup-icon">🕐</span>
+                    <span class="popup-text">${this.formatOperatingHours(pool.operating_hours)}</span>
+                </div>` : ''}
+                ${pool.lanes || pool.pool_size ? `
+                <div class="popup-info-row">
+                    <span class="popup-icon">🏊</span>
+                    <span class="popup-text">${pool.pool_size || ''}${pool.lanes ? ` · ${pool.lanes}레인` : ''}</span>
+                </div>` : ''}
+                ${pool.parking !== null && pool.parking !== undefined ? `
+                <div class="popup-info-row">
+                    <span class="popup-icon">🅿️</span>
+                    <span class="popup-text">주차 ${pool.parking ? '가능' : '불가'}</span>
+                </div>` : ''}
                 <div class="popup-actions">
                     <button class="nav-btn naver" onclick="event.stopPropagation(); window.swimApp.openNavigation(${JSON.stringify(pool).replace(/"/g, '&quot;')}, 'naver')">네이버 지도</button>
                     <button class="nav-btn kakao" onclick="event.stopPropagation(); window.swimApp.openNavigation(${JSON.stringify(pool).replace(/"/g, '&quot;')}, 'kakao')">카카오 맵</button>
                 </div>
                 <div class="premium-divider"></div>
-                ${this.renderFreeSwimTimetable(pool.free_swim_times)}
+                ${this.renderPricingTable(pool.pricing)}
+                ${this.renderWeeklySchedule(pool.free_swim_schedule)}
                 ${this.renderFacilityIcons(pool.facilities)}
+                ${pool.notes ? `<div class="popup-notes">📝 ${pool.notes}</div>` : ''}
                 ${pool.description ? `<p class="description">${pool.description}</p>` : ''}
             </div>
         `;
     }
 
+    // ─── 카드 (목록) ──────────────────────────────────
+
     createPoolListItem(pool, number) {
         const openInfo = this.isNowOpen(pool.operating_hours);
         const statusClass = `status-${openInfo.status}`;
+        const todayPrice = this.getTodayPrice(pool);
+        const todayTimes = this.getTodayFreeSwim(pool);
+        const todayKr = this.getTodayDayKr();
+
+        // 오늘 자유수영 정보 렌더링
+        let todayInfoHtml = '';
+        if (todayPrice || todayTimes.length > 0) {
+            todayInfoHtml = '<div class="card-today-info">';
+            if (todayPrice) {
+                todayInfoHtml += `<div class="card-today-price">${this.formatPrice(todayPrice)} <span class="price-unit">${this.isWeekend() ? '주말' : '평일'}</span></div>`;
+            }
+            if (todayTimes.length > 0) {
+                todayInfoHtml += '<div class="card-today-times">';
+                todayInfoHtml += `<span class="card-time-label">${todayKr}</span>`;
+                for (const t of todayTimes) {
+                    todayInfoHtml += `<span class="card-time-chip">${t.split('-')[0]}</span>`;
+                }
+                todayInfoHtml += '</div>';
+            }
+            todayInfoHtml += '</div>';
+        }
 
         const li = document.createElement('div');
         li.className = 'pool-card';
@@ -470,16 +700,10 @@ class SwimSeoulApp {
                     ${pool.rating ? `<span class="meta-badge rating">⭐ ${pool.rating}</span>` : ''}
                     ${pool.distance ? `<span class="meta-badge distance">📍 ${(pool.distance).toFixed(1)}km</span>` : ''}
                 </div>
-                <div class="pool-prices">
-                    <div class="price-item">
-                        <span class="price-label">강습</span>
-                        <span class="price-value">${this.formatPrice(pool.monthly_lesson_price)}</span>
-                    </div>
-                    <div class="price-item">
-                        <span class="price-label">자유수영</span>
-                        <span class="price-value">${this.formatPrice(pool.free_swim_price)}</span>
-                    </div>
-                </div>
+                ${todayInfoHtml}
+                ${pool.phone ? `<p class="pool-phone">📞 ${pool.phone}</p>` : ''}
+                ${pool.operating_hours ? `<p class="pool-hours">🕐 ${this.formatOperatingHours(pool.operating_hours)}</p>` : ''}
+                ${pool.lanes || pool.pool_size ? `<p class="pool-lanes">🏊 ${pool.pool_size || ''}${pool.lanes ? ` · ${pool.lanes}레인` : ''}</p>` : ''}
                 ${this.renderFacilityIcons(pool.facilities)}
                 <div class="card-actions">
                     <button class="action-btn-mini naver" onclick="event.stopPropagation(); window.swimApp.openNavigation(${JSON.stringify(pool).replace(/"/g, '&quot;')}, 'naver')">N</button>
@@ -491,8 +715,6 @@ class SwimSeoulApp {
 
         li.addEventListener('click', () => {
             this.selectPool(number, { focusMap: true, openPopup: true, zoom: 16 });
-
-            // Mobile specific: Switch to map view on list click
             if (window.innerWidth <= 768 && !this.isMobileMapView) {
                 this.toggleMobileView();
             }
@@ -513,23 +735,16 @@ class SwimSeoulApp {
         return li;
     }
 
+    // ─── 하이라이트/선택 ──────────────────────────────
+
     highlightSidebarListItem(number) {
         const listItem = document.querySelector(`.pool-card[data-pool-number="${number}"]`);
-        if (listItem) {
-            listItem.classList.add('highlighted');
-
-            // Only scroll if we are in list view
-            if (window.innerWidth > 768 || !this.isMobileMapView) {
-                // Scroll logic...
-            }
-        }
+        if (listItem) listItem.classList.add('highlighted');
     }
 
     unhighlightSidebarListItem(number) {
         const listItem = document.querySelector(`.pool-card[data-pool-number="${number}"]`);
-        if (listItem) {
-            listItem.classList.remove('highlighted');
-        }
+        if (listItem) listItem.classList.remove('highlighted');
     }
 
     highlightPoolCard(number) { this.highlightSidebarListItem(number); }
@@ -541,7 +756,6 @@ class SwimSeoulApp {
         if (!container) return;
 
         const itemTop = listItem.offsetTop;
-        const containerTop = container.scrollTop;
         const containerHeight = container.clientHeight;
         const itemHeight = listItem.clientHeight;
 
@@ -556,9 +770,7 @@ class SwimSeoulApp {
 
         targetScroll = Math.max(0, Math.min(targetScroll, container.scrollHeight - containerHeight));
 
-        if (Math.abs(targetScroll - containerTop) < 4) {
-            return;
-        }
+        if (Math.abs(targetScroll - container.scrollTop) < 4) return;
 
         const startScroll = container.scrollTop;
         const distance = targetScroll - startScroll;
@@ -570,9 +782,7 @@ class SwimSeoulApp {
             const progress = Math.min(elapsed / duration, 1);
             const easeOut = 1 - Math.pow(1 - progress, 3);
             container.scrollTop = startScroll + (distance * easeOut);
-            if (progress < 1) {
-                requestAnimationFrame(animateScroll);
-            }
+            if (progress < 1) requestAnimationFrame(animateScroll);
         };
 
         requestAnimationFrame(animateScroll);
@@ -585,12 +795,10 @@ class SwimSeoulApp {
     highlightMarker(number) {
         const marker = this.poolMarkers[number - 1];
         if (marker) {
-            const markerElement = marker.getElement();
-            if (markerElement) {
-                const markerDiv = markerElement.querySelector('.custom-marker');
-                if (markerDiv) {
-                    markerDiv.classList.add('highlighted');
-                }
+            const el = marker.getElement();
+            if (el) {
+                const div = el.querySelector('.custom-marker');
+                if (div) div.classList.add('highlighted');
             }
         }
     }
@@ -598,12 +806,10 @@ class SwimSeoulApp {
     unhighlightMarker(number) {
         const marker = this.poolMarkers[number - 1];
         if (marker) {
-            const markerElement = marker.getElement();
-            if (markerElement) {
-                const markerDiv = markerElement.querySelector('.custom-marker');
-                if (markerDiv) {
-                    markerDiv.classList.remove('highlighted');
-                }
+            const el = marker.getElement();
+            if (el) {
+                const div = el.querySelector('.custom-marker');
+                if (div) div.classList.remove('highlighted');
             }
         }
     }
@@ -617,10 +823,10 @@ class SwimSeoulApp {
 
             const prevMarker = this.poolMarkers[this.selectedPoolNumber - 1];
             if (prevMarker) {
-                const prevMarkerElement = prevMarker.getElement();
-                if (prevMarkerElement) {
-                    const prevMarkerDiv = prevMarkerElement.querySelector('.custom-marker');
-                    if (prevMarkerDiv) prevMarkerDiv.classList.remove('selected');
+                const el = prevMarker.getElement();
+                if (el) {
+                    const div = el.querySelector('.custom-marker');
+                    if (div) div.classList.remove('selected');
                 }
             }
         }
@@ -635,12 +841,10 @@ class SwimSeoulApp {
 
         const marker = this.poolMarkers[number - 1];
         if (marker) {
-            const markerElement = marker.getElement();
-            if (markerElement) {
-                const markerDiv = markerElement.querySelector('.custom-marker');
-                if (markerDiv) {
-                    markerDiv.classList.add('selected');
-                }
+            const el = marker.getElement();
+            if (el) {
+                const div = el.querySelector('.custom-marker');
+                if (div) div.classList.add('selected');
             }
 
             if (focusMap) {
@@ -725,6 +929,8 @@ class SwimSeoulApp {
         this.map.panBy([-shift.x, -shift.y], { animate: true, duration: 0.25 });
     }
 
+    // ─── 디버그 ───────────────────────────────────────
+
     logFocusSettings() {
         console.info(
             `[SwimSeoul] Viewport=(${this.focusAnchor.x.toFixed(2)}, ${this.focusAnchor.y.toFixed(2)}), ` +
@@ -774,6 +980,8 @@ class SwimSeoulApp {
         if (radiusKm <= 25) return 10;
         return 9;
     }
+
+    // ─── 검색 ─────────────────────────────────────────
 
     async searchAddress(query) {
         try {
@@ -825,10 +1033,12 @@ class SwimSeoulApp {
         this.showLoader();
         const radius = parseFloat(document.getElementById('search-radius').value);
         try {
+            const filterParams = this.getFilterParams();
             const params = new URLSearchParams({
                 lat: location.lat,
                 lng: location.lng,
-                radius: radius
+                radius: radius,
+                ...filterParams
             });
 
             const response = await fetch(
@@ -919,6 +1129,8 @@ class SwimSeoulApp {
         }
     }
 
+    // ─── 지하철 ───────────────────────────────────────
+
     toggleSubway() {
         this.showSubway = !this.showSubway;
         const btn = document.getElementById('toggle-subway');
@@ -967,7 +1179,6 @@ class SwimSeoulApp {
                 await this.searchNearbyPools(location);
 
                 if (this.poolMarkers.length === 0) {
-                    console.log('No pools found nearby, loading all pools');
                     await this.loadPools();
                 }
             },
@@ -1033,7 +1244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         현재값: () => app.logFocusSettings(),
         팝업자동조정: (enable) => {
             app.popupAutoAdjust = !!enable;
-            console.info(`✅ 팝업 자동 조정: ${app.popupAutoAdjust ? 'ON' : 'OFF'}`);
+            console.info(`팝업 자동 조정: ${app.popupAutoAdjust ? 'ON' : 'OFF'}`);
         }
     };
     app.init();
